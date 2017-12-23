@@ -7,12 +7,9 @@ fs   = require 'fs-plus'
 util = require 'util'
 exec = require('child_process').execSync
 mkdirp = require 'mkdirp'
-console.log '.... starting tv.coffee ....'
-
-TVDB = require 'node-tvdb/compat'
-tvdb = new TVDB '2C92771D87CA8718'
 request = require 'request'
-parsePipeList = TVDB.utils.parsePipeList
+
+console.log '.... starting tv.coffee ....'
 
 ################################
 # constants
@@ -31,23 +28,46 @@ usbHost    = process.argv[2] + '@' + process.argv[3]
 
 timeLimit = Date.now() - 3*7*24*60*60*1000 # 3 weeks ago
 
+# async routines
+getUsbFiles = delOldFiles = checkFiles = checkFile = checkFileExists = checkFile = null
+
+
+#######################################
+# get theTvDb api token
+
+theTvDbToken = null
+
+request.post 'https://api.thetvdb.com/login',
+  {json:true, body: {apikey: "2C92771D87CA8718"}},
+  (error, response, body) =>
+    if error or response.statusCode != 200
+      console.log 'theTvDb login error:', error
+      console.log 'theTvDb statusCode:', response && response.statusCode
+      process.exit()
+    else
+      theTvDbToken = body.token
+      process.nextTick delOldFiles
+
 ######################################################
 # delete old files in usb and local videos/err folders
 
-usbFiles = exec("ssh #{usbHost} " +
-                '"find videos -type f -printf \'%CY-%Cm-%Cd %P\n\'"',
-                {timeout:10000}).toString().split '\n'
+delOldFiles = =>
+  console.log "\n.... checking for files to delete ...."
+  usbFiles = exec("ssh #{usbHost} " +
+                  '"find videos -type f -printf \'%CY-%Cm-%Cd %P\n\'"',
+                  {timeout:10000}).toString().split '\n'
 
-for usbLine in usbFiles
-  usbDate = new Date(usbLine.slice 0,10).getTime()
-  fname   = usbLine.slice 11
-  if usbDate < timeLimit
-    console.log 'removing old file:', fname
-    rimraf.sync videosPath + fname, {disableGlob:true}
-    rimraf.sync errPath    + fname, {disableGlob:true}
-    console.log exec("ssh #{usbHost} 'rm videos/#{fname}'",
-                     {timeout:10000}).toString()
+  for usbLine in usbFiles
+    usbDate = new Date(usbLine.slice 0,10).getTime()
+    fname   = usbLine.slice 11
+    if usbDate < timeLimit
+      console.log 'removing old file:', fname
+      rimraf.sync videosPath + fname, {disableGlob:true}
+      rimraf.sync errPath    + fname, {disableGlob:true}
+      console.log exec("ssh #{usbHost} 'rm videos/#{fname}'",
+                       {timeout:10000}).toString()
 
+  process.nextTick checkFiles
 
 ############################################################
 # utilities to download file into local folder
@@ -66,35 +86,58 @@ getGoodFile = (fname, tvFilePath) ->
 ############################################################
 # check each remote file, compute series and episode numbers
 
-usbFiles = exec("ssh #{usbHost} " +
-                '"find videos -type f -printf \'%CY-%Cm-%Cd %P\n\'"',
-                {timeout:10000}).toString().split '\n'
+usbFiles = seriesName = null
 
-for usbLine in usbFiles
-  title = season = type = null
-  fname   = usbLine.slice 11
-  guessItRes = exec("guessit -js '#{fname}'", {timeout:10000}).toString()
-  try
-    {title, season, type} = JSON.parse guessItRes
-    if not type == 'episode'
-      console.log 'skipping non-episode:', fname
-      continue
-    if not season
-      console.log 'no season for ' + fname
-      getBadFile fname
-      continue
-  catch
-    console.log 'error parsing:' + fname
-    continue
+checkFiles = =>
+  usbFiles = exec("ssh #{usbHost} " +
+                  '"find videos -type f -printf \'%CY-%Cm-%Cd %P\n\'"',
+                  {timeout:10000}).toString().split '\n'
+  process.nextTick checkFile
 
-  tvFilePath = "#{tvPath}#{title}/Season #{season}/#{fname}"
+checkFile = =>
+  if usbLine = usbFiles.shift()
+    title = season = type = null
+    fname   = usbLine.slice 11
+    guessItRes = exec("guessit -js '#{fname}'", {timeout:10000}).toString()
+    try
+      {title, season, type} = JSON.parse guessItRes
+      if not type == 'episode'
+        console.log 'skipping non-episode:', fname
+        process.nextTick checkFile
+      if not season
+        console.log 'no season for ' + fname
+        getBadFile fname
+        process.nextTick checkFile
+    catch
+      console.log 'error parsing:' + fname
+      process.nextTick checkFile
+
+    console.log '\ngetting canonical series name for:', title
+
+    request 'https://api.thetvdb.com/search/series?name=' + encodeURIComponent(title),
+      {json:true, headers: {Authorization: 'Bearer ' + theTvDbToken}},
+      (error, response, body) =>
+        if error or (response != 200)
+          console.log 'no series name found in theTvDB:', fname
+          console.log 'search error:', error
+          console.log 'search statusCode:', response && response.statusCode
+          console.log 'search body:', body
+          process.nextTick checkFile
+        else
+          # console.log 'canonical:', body
+          seriesName = body.seriesName
+          process.nextTick checkFileExists
+  else
+    process.nextTick checkFileExists
+
+checkFileExists = =>
+  tvFilePath = "#{tvPath}#{seriesName}/Season #{season}/#{fname}"
   if fs.existsSync tvFilePath
-    console.log "skipping existing file: #{fname}"
-    continue
-
-  mkdirp.sync "#{tvPath}#{title}/Season #{season}"
-  getGoodFile fname, tvFilePath
-  continue
+    console.log "skipping existing file: #{tvFilePath}"
+  else
+    mkdirp.sync "#{tvPath}#{seriesName}/Season #{season}"
+    getGoodFile fname, tvFilePath
+  process.nextTick checkFile
 
 return
 
@@ -107,7 +150,7 @@ return
 
 
 
-
+###
 
 
 

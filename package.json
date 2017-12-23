@@ -1,0 +1,26 @@
+{
+  "name": "tv-proc",
+  "version": "1.0.0",
+  "description": "Download from USB and insert files into structured tv folder",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mark-hahn/tv-proc.git"
+  },
+  "author": "Mark Hahn",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mark-hahn/tv-proc/issues"
+  },
+  "homepage": "https://github.com/mark-hahn/tv-proc#readme",
+  "dependencies": {
+    "fs-plus": "^3.0.1",
+    "mkdirp": "^0.5.1",
+    "node-tvdb": "^3.2.0",
+    "request": "^2.83.0",
+    "rimraf": "^2.6.2"
+  }
+}

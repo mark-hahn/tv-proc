@@ -42,7 +42,7 @@ fileTimeout = {timeout: 2*60*60*1000} # 2 hours
 ################
 # async routines
 getUsbFiles = delOldFiles = checkFiles = checkFile = badFile =
-checkFileExists = checkFile = null
+checkFileExists = checkFile = chkTvDB = null
 
 
 #######################################
@@ -129,7 +129,10 @@ badFile = =>
   getBadFile fname
   process.nextTick checkFile
 
+tvDbErrCount = 0
+
 checkFile = =>
+  tvDbErrCount = 0
   if usbLine = usbFiles.shift()
     title = season = type = null
     if localSrcPath
@@ -162,19 +165,30 @@ checkFile = =>
       console.log '\nerror parsing:' + fname
       process.nextTick badFile
       return
+    process.nextTick chkTvDB
+  else
+    console.log 'DONE - downloaded:', downloadCount
 
-    request 'https://api.thetvdb.com/search/series?name=' + encodeURIComponent(title),
-      {json:true, headers: {Authorization: 'Bearer ' + theTvDbToken}},
-      (error, response, body) =>
-        if error or (response?.statusCode != 200)
-          console.log 'no series name found in theTvDB:', fname
-          console.log 'search error:', error
-          console.log 'search statusCode:', response && response.statusCode
-          console.log 'search body:', body
-          process.nextTick badFile
+chkTvDB = =>
+  request 'https://api.thetvdb.com/search/series?name=' + encodeURIComponent(title),
+    {json:true, headers: {Authorization: 'Bearer ' + theTvDbToken}},
+    (error, response, body) =>
+      if error or (response?.statusCode != 200)
+        console.log 'no series name found in theTvDB:', fname
+        console.log 'search error:', error
+        console.log 'search statusCode:', response && response.statusCode
+        console.log 'search body:', body
+        if error
+          if ++tvDbErrCount == 15
+            console.log 'giving up, downloaded:', downloadCount
+            return
+          console.log "tvdb err retry, waiting one minute"
+          setTimeout chkTvDB, 60*1000
         else
-          seriesName = body.data[0].seriesName
-          process.nextTick checkFileExists
+          process.nextTick checkFile
+      else
+        seriesName = body.data[0].seriesName
+        process.nextTick checkFileExists
 
 checkFileExists = =>
   tvSeasonPath = "#{tvPath}#{seriesName}/Season #{season}"

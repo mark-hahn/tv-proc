@@ -1,7 +1,6 @@
 
 # to-do
 #   map
-#   report err count
 #   recurse in dirs
 
 fs   = require 'fs-plus'
@@ -21,6 +20,7 @@ else
 
 console.log ".... starting tv.coffee for #{usbHost || fileRegex || localSrcPath} ...."
 time = Date.now()
+downloadCount = 0;
 
 ###########
 # constants
@@ -108,6 +108,7 @@ getGoodFile = (fname, tvFilePath) ->
     console.log exec("rsync -av '#{usbHost}:videos/#{fname}' '#{tvFilePath}'",
                       fileTimeout).toString(), '-',
                     ((Date.now() - time)/1000).toFixed(0) + ' secs'
+  downloadCount++
   time = Date.now()
 
 ############################################################
@@ -143,7 +144,7 @@ checkFile = =>
     else
       fname = usbLine.slice 11
 
-    console.log '\n>>>>>>', fname
+    console.log '\n>>>>>>', downloadCount, fname
 
     guessItRes = exec("guessit -js '#{fname.replace "'", ''}'",
                       {timeout:10000}).toString()
@@ -152,12 +153,15 @@ checkFile = =>
       if not type == 'episode'
         console.log '\nskipping non-episode:', fname
         process.nextTick badFile
+        return
       if not season
         console.log '\nno season for ' + fname
         process.nextTick badFile
+        return
     catch
       console.log '\nerror parsing:' + fname
       process.nextTick badFile
+      return
 
     request 'https://api.thetvdb.com/search/series?name=' + encodeURIComponent(title),
       {json:true, headers: {Authorization: 'Bearer ' + theTvDbToken}},

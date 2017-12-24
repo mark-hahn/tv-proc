@@ -130,11 +130,11 @@ badFile = =>
   process.nextTick checkFile
 
 tvDbErrCount = 0
+title = season = type = null
 
 checkFile = =>
   tvDbErrCount = 0
   if usbLine = usbFiles.shift()
-    title = season = type = null
     if localSrcPath
       if fileRegex and (new RegExp fileRegex).exec(usbLine) == null
         process.nextTick checkFile

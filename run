@@ -1,2 +1,3 @@
 cd $dev/apps/tv-proc
-coffee main.coffee $usb_user $usb_ip
+#coffee main.coffee $usb_user $usb_ip
+nohup coffee main.coffee >> tv.log &

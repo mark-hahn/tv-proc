@@ -157,8 +157,8 @@ checkFile = =>
         console.log '\nskipping non-episode:', fname
         process.nextTick badFile
         return
-      if not season
-        console.log '\nno season for ' + fname
+      if not Number.isInteger season
+        console.log '\nno season integer for ' + fname
         process.nextTick badFile
         return
     catch

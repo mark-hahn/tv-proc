@@ -1,7 +1,7 @@
 
 # to-do
-#   map
-#   recurse in dirs
+#  map
+#  usb - recurse in dirs
 
 fs   = require 'fs-plus'
 util = require 'util'
@@ -169,7 +169,14 @@ checkFile = =>
   else
     console.log 'DONE - downloaded:', downloadCount
 
+tvdbCache = {}
+
 chkTvDB = =>
+  if tvdbCache[title]
+    seriesName = tvdbCache[title]
+    process.nextTick checkFileExists
+    return
+
   request 'https://api.thetvdb.com/search/series?name=' + encodeURIComponent(title),
     {json:true, headers: {Authorization: 'Bearer ' + theTvDbToken}},
     (error, response, body) =>
@@ -188,6 +195,7 @@ chkTvDB = =>
           process.nextTick checkFile
       else
         seriesName = body.data[0].seriesName
+        tvdbCache[title] = seriesName
         process.nextTick checkFileExists
 
 checkFileExists = =>

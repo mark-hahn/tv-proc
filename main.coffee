@@ -43,10 +43,8 @@ fileTimeout = {timeout: 2*60*60*1000} # 2 hours
 getUsbFiles = delOldFiles = checkFiles = checkFile = badFile =
 checkFileExists = checkFile = chkTvDB = null
 
-
 #######################################
 # get theTvDb api token
-
 theTvDbToken = null
 
 request.post 'https://api.thetvdb.com/login',
@@ -86,42 +84,15 @@ delOldFiles = =>
   process.nextTick checkFiles
 
 ############################################################
-# utilities to download file into local folder
-
-getBadFile = (fname) ->
-  console.log "downloading bad file...\n #{fname} \n... into tv-bad folder"
-  # console.trace()
-  # process.exit(0)
-  console.log exec("rsync -av '#{usbHost}:videos/#{fname}' '#{tvBadPath}'",
-                   fileTimeout).toString()
-  recent[fname] = Date.now()
-  fs.writeFileSync 'tv-recent', JSON.stringify recent
-
-getGoodFile = (fname, usbFilePath, tvFilePath) ->
-  console.log "downloading file: #{usbFilePath}"
-  console.log exec("rsync -av '#{usbHost}:videos/#{usbFilePath}' '#{tvFilePath}'",
-                    fileTimeout).toString(), '-',
-                  ((Date.now() - time)/1000).toFixed(0) + ' secs'
-  downloadCount++
-  time = Date.now()
-
-############################################################
 # check each remote file, compute series and episode numbers
 
-usbFilePath = usbFiles = seriesName = season = fname = null
+usbFilePath = usbFiles = seriesName = season = fname =
+title = season = type = null
+tvDbErrCount = 0
 
 checkFiles = =>
   usbFiles = exec(findUsb, {timeout:10000}).toString().split '\n'
   process.nextTick checkFile
-
-badFile = =>
-  getBadFile fname
-  process.nextTick checkFile
-
-tvDbErrCount = 0
-title = season = type = null
-
-blking = true
 
 checkFile = =>
   tvDbErrCount = 0
@@ -187,15 +158,35 @@ chkTvDB = =>
         tvdbCache[title] = seriesName
         process.nextTick checkFileExists
 
+escQuotes = (str) ->
+  '"' + str.replace('\\', '\\\\').replace('"', '\"') + '"'
+
 checkFileExists = =>
   tvSeasonPath = "#{tvPath}#{seriesName}/Season #{season}"
-  tvFilePath = "#{tvSeasonPath}/#{fname}"
+  tvFilePath   = "#{tvSeasonPath}/#{fname}"
+  usbLongPath  = "#{usbHost}:videos/#{usbFilePath}"
   if fs.existsSync tvFilePath
     console.log "skipping existing file: #{fname}"
   else
     mkdirp.sync tvSeasonPath
-    getGoodFile fname, usbFilePath, tvFilePath
+    if usbFilePath.indexOf('/') > -1
+      console.log "downloading file in dir: #{usbFilePath}"
+    else
+      console.log "downloading file: #{usbFilePath}"
+    console.log exec("rsync -av #{escQuotes usbLongPath} #{escQuotes tvFilePath}",
+                      fileTimeout).toString(), '-',
+                    ((Date.now() - time)/1000).toFixed(0) + ' secs'
+    downloadCount++
+    time = Date.now()
 
+  recent[fname] = Date.now()
+  fs.writeFileSync 'tv-recent', JSON.stringify recent
+  process.nextTick checkFile
+
+badFile = =>
+  console.log "downloading bad file...\n #{fname} \n... into tv-bad folder"
+  console.log exec("rsync -av '#{usbHost}:videos/#{fname}' '#{tvBadPath}'",
+                   fileTimeout).toString()
   recent[fname] = Date.now()
   fs.writeFileSync 'tv-recent', JSON.stringify recent
   process.nextTick checkFile

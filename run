@@ -1,7 +1,2 @@
 cd $dev/apps/tv-proc
-#coffee main.coffee $usb_user $usb_ip
-rm $1.log
-coffee main.coffee >> $1.log &
-tail -f tv.log &
-killall tail
-tail -fn 1000 $1.log &
+coffee main.coffee $usb_user $usb_ip | tee -a tv.log

@@ -20,6 +20,7 @@ else
 
 console.log ".... starting tv.coffee for #{usbHost || fileRegex || localSrcPath} ...."
 time = Date.now()
+chkCount = 0
 downloadCount = 0;
 
 ###########
@@ -65,23 +66,23 @@ request.post 'https://api.thetvdb.com/login',
 # delete old files in usb and local videos/err folders
 
 delOldFiles = =>
-  if localSrcPath then process.nextTick checkFiles; return
-
-  console.log "\n.... checking for files to delete ...."
-  usbFiles = exec("ssh #{usbHost} " +
-                  '"find videos -type f -printf \'%CY-%Cm-%Cd %P\n\'"',
-                  {timeout:10000}).toString().split '\n'
-
-  for usbLine in usbFiles
-    usbDate = new Date(usbLine.slice 0,10).getTime()
-    if usbDate < ageLimit
-      fname = usbLine.slice 11
-      console.log 'removing old file:', fname
-      rimraf.sync videosPath + fname, {disableGlob:true}
-      rimraf.sync errPath    + fname, {disableGlob:true}
-      res = exec("ssh #{usbHost} 'rm videos/#{fname}'",
-                       {timeout:10000}).toString()
-      if (res.length > 1) then console.log res
+  # if localSrcPath then process.nextTick checkFiles; return
+  #
+  # console.log "\n.... checking for files to delete ...."
+  # usbFiles = exec("ssh #{usbHost} " +
+  #                 '"find videos -type f -printf \'%CY-%Cm-%Cd %P\n\'"',
+  #                 {timeout:10000}).toString().split '\n'
+  #
+  # for usbLine in usbFiles
+  #   usbDate = new Date(usbLine.slice 0,10).getTime()
+  #   if usbDate < ageLimit
+  #     fname = usbLine.slice 11
+  #     console.log 'removing old file:', fname
+  #     rimraf.sync videosPath + fname, {disableGlob:true}
+  #     rimraf.sync errPath    + fname, {disableGlob:true}
+  #     res = exec("ssh #{usbHost} 'rm videos/#{fname}'",
+  #                      {timeout:10000}).toString()
+  #     if (res.length > 1) then console.log res
   process.nextTick checkFiles
 
 ############################################################
@@ -132,9 +133,19 @@ badFile = =>
 tvDbErrCount = 0
 title = season = type = null
 
+blking = true
+
 checkFile = =>
   tvDbErrCount = 0
   if usbLine = usbFiles.shift()
+
+    if blking
+      if usbLine == '/mnt/media-old/videos/' + "s03e01 - Too Cloth for Comfort.mp4"
+        blking = false
+      process.nextTick checkFile
+      return
+
+    chkCount++
     if localSrcPath
       if fileRegex and (new RegExp fileRegex).exec(usbLine) == null
         process.nextTick checkFile
@@ -147,7 +158,7 @@ checkFile = =>
     else
       fname = usbLine.slice 11
 
-    console.log '\n>>>>>>', downloadCount, fname
+    console.log '\n>>>>>>', downloadCount,'/', chkCount, fname
 
     guessItRes = exec("guessit -js '#{fname.replace "'", ''}'",
                       {timeout:10000}).toString()
@@ -159,6 +170,9 @@ checkFile = =>
         return
       if not Number.isInteger season
         console.log '\nno season integer for ' + fname
+        process.nextTick badFile
+        return
+      if title[0] < 'Z'
         process.nextTick badFile
         return
     catch
@@ -180,6 +194,7 @@ chkTvDB = =>
   request 'https://api.thetvdb.com/search/series?name=' + encodeURIComponent(title),
     {json:true, headers: {Authorization: 'Bearer ' + theTvDbToken}},
     (error, response, body) =>
+      # console.log {error, response, body}
       if error or (response?.statusCode != 200)
         console.log 'no series name found in theTvDB:', fname
         console.log 'search error:', error

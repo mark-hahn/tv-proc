@@ -32,7 +32,6 @@ for line in mapLines
 recent = JSON.parse fs.readFileSync 'tv-recent', 'utf8'
 
 tvPath    = '/mnt/media/tv/'
-tvBadPath = '/mnt/media/tv-bad/'
 
 usbAgeLimit = Date.now() - 2*7*24*60*60*1000 # 2 weeks ago
 recentLimit = Date.now() - 3*7*24*60*60*1000 # 3 weeks ago
@@ -101,8 +100,13 @@ checkFile = =>
     usbFilePath = usbLine.slice(11)
     parts = usbFilePath.split '/'
     fname = parts[parts.length-1]
+    parts = fname.split '.'
+    fext  = parts[parts.length-1]
+    if fext.length == 6 or fext in ['nfo','idx','sub','txt','jpg','gif','jpeg']
+      process.nextTick checkFile
+      return
     if recent[fname]
-      console.log '>>>>>>', downloadCount,'/', chkCount, 'SKIPPING RECENT:', fname
+      console.log '------', downloadCount,'/', chkCount, 'SKIPPING RECENT:', fname
       process.nextTick checkFile
       return
     console.log '\n>>>>>>', downloadCount,'/', chkCount, fname
@@ -173,9 +177,9 @@ checkFileExists = =>
       console.log "downloading file in dir: #{usbFilePath}"
     else
       console.log "downloading file: #{usbFilePath}"
-    console.log exec("rsync -av #{escQuotes usbLongPath} #{escQuotes tvFilePath}",
-                      fileTimeout).toString(), '-',
-                    ((Date.now() - time)/1000).toFixed(0) + ' secs'
+    console.log(exec("rsync -av #{escQuotes usbLongPath} #{escQuotes tvFilePath}",
+                      fileTimeout).toString().replace('\n\n', '\n'),
+                    ((Date.now() - time)/1000).toFixed(0) + ' secs')
     downloadCount++
     time = Date.now()
 
@@ -184,9 +188,9 @@ checkFileExists = =>
   process.nextTick checkFile
 
 badFile = =>
-  console.log "downloading bad file...\n #{fname} \n... into tv-bad folder"
-  console.log exec("rsync -av '#{usbHost}:videos/#{fname}' '#{tvBadPath}'",
-                   fileTimeout).toString()
+  console.log '******', downloadCount,'/', chkCount, '---BAD---:', fname
   recent[fname] = Date.now()
   fs.writeFileSync 'tv-recent', JSON.stringify recent
+  downloadCount++
+  time = Date.now()
   process.nextTick checkFile

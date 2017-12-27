@@ -1,2 +1,6 @@
 cd $dev/apps/tv-proc
-coffee main.coffee $usb_user $usb_ip | tee -a tv.log
+echo >> tv.log
+date >> tv.log
+coffee main.coffee xobtlu 46.166.143.66 >> tv.log
+date >> tv.log
+echo >> tv.log

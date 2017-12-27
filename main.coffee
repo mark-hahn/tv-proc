@@ -61,7 +61,7 @@ request.post 'https://api.thetvdb.com/login',
 # delete old files in usb/videos
 
 delOldFiles = =>
-  console.log ".... checking for files to delete ....\n"
+  console.log ".... checking for files to delete ...."
   usbFiles = exec(findUsb, {timeout:10000}).toString().split '\n'
 
   for usbLine in usbFiles

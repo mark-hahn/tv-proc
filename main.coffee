@@ -112,9 +112,9 @@ checkFile = =>
       # console.log '------', downloadCount,'/', chkCount, 'SKIPPING RECENT:', fname
       process.nextTick checkFile
       return
-    console.log '\n>>>>>>', downloadCount,'/', chkCount, fname
+    console.log '>>>>>>', downloadCount,'/', chkCount, fname
 
-    guessItRes = exec("guessit -js '#{fname.replace "'", ''}'",
+    guessItRes = exec("/usr/local/bin/guessit -js '#{fname.replace "'", ''}'",
                       {timeout:10000}).toString()
     try
       {title, season, type} = JSON.parse guessItRes

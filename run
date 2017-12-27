@@ -1,5 +1,11 @@
-cd $dev/apps/tv-proc
-echo >> tv.log
-date >> tv.log
-coffee main.coffee xobtlu 46.166.143.66 >> tv.log
-date >> tv.log
+
+s="$(pgrep -f tv-proc/main.js)"
+if [ ${#s} -gt 1 ] ; then
+  exit
+fi
+cd /root/dev/apps/tv-proc
+echo >> /root/dev/apps/tv-proc/tv.log
+date >> /root/dev/apps/tv-proc/tv.log
+/root/.nvm/versions/node/v8.9.3/bin/node                      \
+          /root/dev/apps/tv-proc/main.js xobtlu 46.166.143.66
+date >> /root/dev/apps/tv-proc/tv.log

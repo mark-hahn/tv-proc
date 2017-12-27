@@ -3,4 +3,3 @@ echo >> tv.log
 date >> tv.log
 coffee main.coffee xobtlu 46.166.143.66 >> tv.log
 date >> tv.log
-echo >> tv.log

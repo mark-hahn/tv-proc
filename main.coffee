@@ -14,9 +14,9 @@ else
   usbHost = process.argv[2] + '@' + process.argv[3]
 
 console.log ".... starting tv.coffee for #{usbHost || fileRegex} ...."
-time = Date.now()
-chkCount = 0
-downloadCount = 0;
+startTime = time = Date.now()
+deleteCount = chkCount = recentCount = existsCount = errCount = downloadCount = 0;
+
 findUsb = "ssh #{usbHost} find videos -type f -printf '%CY-%Cm-%Cd-%P\\\\\\n'"
 
 ###########
@@ -68,6 +68,7 @@ delOldFiles = =>
     usbDate = new Date(usbLine.slice 0,10).getTime()
     if usbDate < usbAgeLimit
       usbFilePath = usbLine.slice 11
+      deleteCount++
       console.log 'removing old file:', usbFilePath
       res = exec("ssh #{usbHost} 'rm -rf videos/#{usbFilePath}'",
                        {timeout:10000}).toString()
@@ -80,6 +81,7 @@ delOldFiles = =>
   if recentChgd
     fs.writeFileSync 'tv-recent', JSON.stringify recent
 
+  console.log ".... downloading files ...."
   process.nextTick checkFiles
 
 ############################################################
@@ -106,7 +108,8 @@ checkFile = =>
       process.nextTick checkFile
       return
     if recent[fname]
-      console.log '------', downloadCount,'/', chkCount, 'SKIPPING RECENT:', fname
+      recentCount++
+      # console.log '------', downloadCount,'/', chkCount, 'SKIPPING RECENT:', fname
       process.nextTick checkFile
       return
     console.log '\n>>>>>>', downloadCount,'/', chkCount, fname
@@ -129,8 +132,13 @@ checkFile = =>
       return
     process.nextTick chkTvDB
   else
-    console.log 'DONE - downloaded:', downloadCount
-
+    console.log '.... done ....\ndeleted:         ', deleteCount,
+                              '\nskipped recent:  ', recentCount,
+                              '\nskipped existing:', existsCount
+                              '\nerrors:          ', errCount,
+                              '\ndownloaded:      ', downloadCount,
+                              '\nelapsed(mins):   ',
+                              ((Date.now()-startTime)/(60*1000)).toFixed(1)
 tvdbCache = {}
 
 chkTvDB = =>
@@ -172,6 +180,7 @@ checkFileExists = =>
   tvFilePath   = "#{tvSeasonPath}/#{fname}"
   usbLongPath  = "#{usbHost}:videos/#{usbFilePath}"
   if fs.existsSync tvFilePath
+    existsCount++
     console.log "skipping existing file: #{fname}"
   else
     mkdirp.sync tvSeasonPath
@@ -190,6 +199,7 @@ checkFileExists = =>
   process.nextTick checkFile
 
 badFile = =>
+  errCount++
   console.log '******', downloadCount,'/', chkCount, '---BAD---:', fname
   recent[fname] = Date.now()
   fs.writeFileSync 'tv-recent', JSON.stringify recent

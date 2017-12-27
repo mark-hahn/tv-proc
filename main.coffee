@@ -158,7 +158,9 @@ chkTvDB = =>
           process.nextTick checkFile
       else
         seriesName = body.data[0].seriesName
-        if map[seriesName] then seriesName = map[seriesName]
+        if map[seriesName]
+          console.log '+++ Mapping', seriesName, 'to', map[seriesName]
+          seriesName = map[seriesName]
         tvdbCache[title] = seriesName
         process.nextTick checkFileExists
 

@@ -8,4 +8,5 @@ echo >> /root/dev/apps/tv-proc/tv.log
 date >> /root/dev/apps/tv-proc/tv.log
 /root/.nvm/versions/node/v8.9.3/bin/node                      \
           /root/dev/apps/tv-proc/main.js xobtlu 46.166.143.66
+chmod -R 774 /mnt/media/tv
 date >> /root/dev/apps/tv-proc/tv.log

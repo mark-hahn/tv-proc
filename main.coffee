@@ -104,7 +104,7 @@ checkFile = =>
     fname = parts[parts.length-1]
     parts = fname.split '.'
     fext  = parts[parts.length-1]
-    if fext.length == 6 or fext in ['nfo','idx','sub','txt','jpg','gif','jpeg']
+    if fext.length == 6 or fext in ['nfo','idx','sub','txt','jpg','gif','jpeg','part']
       process.nextTick checkFile
       return
     if recent[fname]
@@ -139,6 +139,7 @@ checkFile = =>
                               '\ndownloaded:      ', downloadCount,
                               '\nelapsed(mins):   ',
                               ((Date.now()-startTime)/(60*1000)).toFixed(1)
+
 tvdbCache = {}
 
 chkTvDB = =>

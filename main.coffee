@@ -132,14 +132,17 @@ checkFile = =>
       return
     process.nextTick chkTvDB
   else
-    console.log '.... done ....\ndeleted:         ', deleteCount,
-                              '\nskipped recent:  ', recentCount,
-                              '\nskipped existing:', existsCount
-                              '\nerrors:          ', errCount,
-                              '\ndownloaded:      ', downloadCount,
-                              '\nelapsed(mins):   ',
-                              ((Date.now()-startTime)/(60*1000)).toFixed(1)
-
+    console.log '.... done ....'
+    console.log  'skipped recent:  ', recentCount,
+               '\ndeleted:         ', deleteCount,
+               '\nskipped recent:  ', recentCount,
+               '\nskipped existing:', existsCount,
+               '\nerrors:          ', errCount,
+               '\ndownloaded:      ', downloadCount,
+               '\nelapsed(mins):   ',
+               ((Date.now()-startTime)/(60*1000)).toFixed(1)
+    if deleteCount + existsCount + errCount + downloadCount > 0
+      console.log "***********************************************************"
 tvdbCache = {}
 
 chkTvDB = =>

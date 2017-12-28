@@ -145,7 +145,7 @@
       fname = parts[parts.length - 1];
       parts = fname.split('.');
       fext = parts[parts.length - 1];
-      if (fext.length === 6 || (fext === 'nfo' || fext === 'idx' || fext === 'sub' || fext === 'txt' || fext === 'jpg' || fext === 'gif' || fext === 'jpeg')) {
+      if (fext.length === 6 || (fext === 'nfo' || fext === 'idx' || fext === 'sub' || fext === 'txt' || fext === 'jpg' || fext === 'gif' || fext === 'jpeg' || fext === 'part')) {
         process.nextTick(checkFile);
         return;
       }
@@ -178,7 +178,11 @@
       }
       return process.nextTick(chkTvDB);
     } else {
-      return console.log('.... done ....\ndeleted:         ', deleteCount, '\nskipped recent:  ', recentCount, '\nskipped existing:', existsCount, '\nerrors:          ', errCount, '\ndownloaded:      ', downloadCount, '\nelapsed(mins):   ', ((Date.now() - startTime) / (60 * 1000)).toFixed(1));
+      console.log('.... done ....');
+      console.log('skipped recent:  ', recentCount, '\ndeleted:         ', deleteCount, '\nskipped recent:  ', recentCount, '\nskipped existing:', existsCount, '\nerrors:          ', errCount, '\ndownloaded:      ', downloadCount, '\nelapsed(mins):   ', ((Date.now() - startTime) / (60 * 1000)).toFixed(1));
+      if (deleteCount + existsCount + errCount + downloadCount > 0) {
+        return console.log("***********************************************************");
+      }
     }
   };
 

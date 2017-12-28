@@ -135,7 +135,6 @@ checkFile = =>
     console.log '.... done ....'
     console.log  'skipped recent:  ', recentCount,
                '\ndeleted:         ', deleteCount,
-               '\nskipped recent:  ', recentCount,
                '\nskipped existing:', existsCount,
                '\nerrors:          ', errCount,
                '\ndownloaded:      ', downloadCount,

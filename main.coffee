@@ -37,6 +37,9 @@ usbAgeLimit = Date.now() - 2*7*24*60*60*1000 # 2 weeks ago
 recentLimit = Date.now() - 3*7*24*60*60*1000 # 3 weeks ago
 fileTimeout = {timeout: 2*60*60*1000} # 2 hours
 
+escQuotes = (str) ->
+  '"' + str.replace('\\', '\\\\').replace('"', '\"') + '"'
+
 ################
 # async routines
 getUsbFiles = delOldFiles = checkFiles = checkFile = badFile =
@@ -70,7 +73,7 @@ delOldFiles = =>
       usbFilePath = usbLine.slice 11
       deleteCount++
       console.log 'removing old file:', usbFilePath
-      res = exec("ssh #{usbHost} 'rm -rf videos/#{usbFilePath}'",
+      res = exec("ssh #{usbHost} 'rm -rf #{escQuotes "videos/" + usbFilePath}'",
                        {timeout:10000}).toString()
       if (res.length > 1) then console.log res
 
@@ -174,9 +177,6 @@ chkTvDB = =>
           seriesName = map[seriesName]
         tvdbCache[title] = seriesName
         process.nextTick checkFileExists
-
-escQuotes = (str) ->
-  '"' + str.replace('\\', '\\\\').replace('"', '\"') + '"'
 
 checkFileExists = =>
   tvSeasonPath = "#{tvPath}#{seriesName}/Season #{season}"

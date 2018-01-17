@@ -1,4 +1,9 @@
 
+#todo
+#  lazy-login to thetvdb
+#  add episode dupes to counter summary
+#  move episode dupes code to this file
+
 fs   = require 'fs-plus'
 util = require 'util'
 exec = require('child_process').execSync

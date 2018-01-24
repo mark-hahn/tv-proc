@@ -42,8 +42,11 @@ usbAgeLimit = Date.now() - 2*7*24*60*60*1000 # 2 weeks ago
 recentLimit = Date.now() - 3*7*24*60*60*1000 # 3 weeks ago
 fileTimeout = {timeout: 2*60*60*1000} # 2 hours
 
+escQuotesS = (str) ->
+  '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\"').replace(/\s/g, '\\ ') + '"'
+
 escQuotes = (str) ->
-  '"' + str.replace('\\', '\\\\').replace('"', '\"') + '"'
+  '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\"') + '"'
 
 ################
 # async routines
@@ -186,7 +189,8 @@ chkTvDB = =>
 checkFileExists = =>
   tvSeasonPath = "#{tvPath}#{seriesName}/Season #{season}"
   tvFilePath   = "#{tvSeasonPath}/#{fname}"
-  usbLongPath  = "#{usbHost}:videos/#{usbFilePath}"
+  videoPath    = "videos/#{usbFilePath}"
+  usbLongPath  = "#{usbHost}:#{videoPath}"
   if fs.existsSync tvFilePath
     existsCount++
     console.log "skipping existing file: #{fname}"
@@ -196,7 +200,13 @@ checkFileExists = =>
       console.log "downloading file in dir: #{usbFilePath}"
     else
       console.log "downloading file: #{usbFilePath}"
-    console.log(exec("rsync -av #{escQuotes usbLongPath} #{escQuotes tvFilePath}",
+    # console.log escQuotes tvSeasonPath
+    # console.log escQuotes tvFilePath
+    # console.log escQuotes videoPath
+    # console.log escQuotes usbLongPath
+    # console.log "\nrsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}\n"
+
+    console.log(exec("rsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}",
                       fileTimeout).toString().replace('\n\n', '\n'),
                     ((Date.now() - time)/1000).toFixed(0) + ' secs')
     downloadCount++

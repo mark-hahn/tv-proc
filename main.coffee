@@ -43,10 +43,10 @@ recentLimit = Date.now() - 3*7*24*60*60*1000 # 3 weeks ago
 fileTimeout = {timeout: 2*60*60*1000} # 2 hours
 
 escQuotesS = (str) ->
-  '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\"').replace(/\s/g, '\\ ') + '"'
+  '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'").replace(/\s/g, '\\ ') + '"'
 
 escQuotes = (str) ->
-  '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\"') + '"'
+  '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'") + '"'
 
 ################
 # async routines
@@ -200,11 +200,11 @@ checkFileExists = =>
       console.log "downloading file in dir: #{usbFilePath}"
     else
       console.log "downloading file: #{usbFilePath}"
-    # console.log escQuotes tvSeasonPath
-    # console.log escQuotes tvFilePath
-    # console.log escQuotes videoPath
-    # console.log escQuotes usbLongPath
-    # console.log "\nrsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}\n"
+    console.log escQuotes tvSeasonPath
+    console.log escQuotes tvFilePath
+    console.log escQuotes videoPath
+    console.log escQuotes usbLongPath
+    console.log "\nrsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}\n"
 
     console.log(exec("rsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}",
                       fileTimeout).toString().replace('\n\n', '\n'),

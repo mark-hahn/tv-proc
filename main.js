@@ -4,7 +4,7 @@
   //  lazy-login to thetvdb
   //  add episode dupes to counter summary
   //  move episode dupes code to this file
-  var badFile, checkFile, checkFileExists, checkFiles, chkCount, chkTvDB, delOldFiles, deleteCount, downloadCount, errCount, escQuotes, escQuotesS, exec, existsCount, f, fileRegex, fileTimeout, findUsb, fname, fs, getUsbFiles, i, len, line, map, mapLines, mapStr, mkdirp, recent, recentCount, recentLimit, request, rimraf, season, seriesName, startTime, t, theTvDbToken, time, title, tvDbErrCount, tvPath, tvdbCache, type, usbAgeLimit, usbFilePath, usbFiles, usbHost, util;
+  var badFile, checkFile, checkFileExists, checkFiles, chkCount, chkTvDB, delOldFiles, deleteCount, downloadCount, errCount, errors, escQuotes, escQuotesS, exec, existsCount, f, fileRegex, fileTimeout, findUsb, fname, fs, getUsbFiles, i, len, line, map, mapLines, mapStr, mkdirp, recent, recentCount, recentLimit, request, rimraf, season, seriesName, startTime, t, theTvDbToken, time, title, tvDbErrCount, tvPath, tvdbCache, type, usbAgeLimit, usbFilePath, usbFiles, usbHost, util;
 
   fs = require('fs-plus');
 
@@ -52,6 +52,8 @@
 
   recent = JSON.parse(fs.readFileSync('tv-recent', 'utf8'));
 
+  errors = JSON.parse(fs.readFileSync('tv-errors', 'utf8'));
+
   tvPath = '/mnt/media/tv/';
 
   usbAgeLimit = Date.now() - 2 * 7 * 24 * 60 * 60 * 1000; // 2 weeks ago
@@ -63,11 +65,11 @@
   };
 
   escQuotesS = function(str) {
-    return '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\"').replace(/'/g, "\\'").replace(/\s/g, '\\ ') + '"';
+    return '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'").replace(/\s/g, '\\ ') + '"';
   };
 
   escQuotes = function(str) {
-    return '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\"').replace(/'/g, "\\'") + '"';
+    return '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'") + '"';
   };
 
   //###############
@@ -166,7 +168,12 @@
         process.nextTick(checkFile);
         return;
       }
-      console.log('>>>>>>', downloadCount, '/', chkCount, fname);
+      if (errors[fname]) {
+        // console.log '------', downloadCount,'/', chkCount, 'SKIPPING *ERROR*:', fname
+        process.nextTick(checkFile);
+        return;
+      }
+      console.log('>>>>>>', downloadCount, '/', chkCount, errCount, fname);
       guessItRes = exec(`/usr/local/bin/guessit -js '${fname.replace("'", '')}'`, {
         timeout: 10000
       }).toString();
@@ -225,7 +232,7 @@
           console.log("tvdb err retry, waiting one minute");
           return setTimeout(chkTvDB, 60 * 1000);
         } else {
-          return process.nextTick(checkFile);
+          return process.nextTick(badFile);
         }
       } else {
         seriesName = body.data[0].seriesName;
@@ -271,11 +278,8 @@
 
   badFile = () => {
     errCount++;
-    console.log('******', downloadCount, '/', chkCount, '---BAD---:', fname);
-    recent[fname] = Date.now();
-    fs.writeFileSync('tv-recent', JSON.stringify(recent));
-    downloadCount++;
-    time = Date.now();
+    errors[fname] = true;
+    fs.writeFileSync('tv-errors', JSON.stringify(errors));
     return process.nextTick(checkFile);
   };
 

@@ -205,11 +205,11 @@ checkFileExists = =>
       console.log "downloading file in dir: #{usbFilePath}"
     else
       console.log "downloading file: #{usbFilePath}"
-    console.log escQuotes tvSeasonPath
-    console.log escQuotes tvFilePath
-    console.log escQuotes videoPath
-    console.log escQuotes usbLongPath
-    console.log "\nrsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}\n"
+    # console.log escQuotes tvSeasonPath
+    # console.log escQuotes tvFilePath
+    # console.log escQuotes videoPath
+    # console.log escQuotes usbLongPath
+    # console.log "\nrsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}\n"
 
     console.log(exec("rsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}",
                       fileTimeout).toString().replace('\n\n', '\n'),

@@ -111,7 +111,7 @@
         usbFilePath = usbLine.slice(11);
         deleteCount++;
         console.log('removing old file:', usbFilePath);
-        res = exec(`ssh ${usbHost} 'rm -rf ${escQuotes("videos/" + usbFilePath)}'`, {
+        res = exec(`ssh ${usbHost} rm -rf ${escQuotesS("videos/" + usbFilePath)}`, {
           timeout: 10000
         }).toString();
         if (res.length > 1) {

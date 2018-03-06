@@ -44,7 +44,12 @@ recentLimit = Date.now() - 3*7*24*60*60*1000 # 3 weeks ago
 fileTimeout = {timeout: 2*60*60*1000} # 2 hours
 
 escQuotesS = (str) ->
-  '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'").replace(/\s/g, '\\ ') + '"'
+  '"' + str.replace(/\\/g, '\\\\')
+           .replace(/"/g,  '\\"')
+           .replace(/'/g,  "\\'")
+           .replace(/\(/g, "\\(")
+           .replace(/\)/g, "\\)")
+           .replace(/\s/g, '\\ ')  + '"'
 
 escQuotes = (str) ->
   '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'") + '"'

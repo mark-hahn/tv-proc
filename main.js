@@ -102,7 +102,7 @@
     var j, len1, recentChgd, recentFname, recentTime, res, usbDate, usbFilePath, usbFiles, usbLine;
     console.log(".... checking for files to delete ....");
     usbFiles = exec(findUsb, {
-      timeout: 10000
+      timeout: 300000
     }).toString().split('\n');
     for (j = 0, len1 = usbFiles.length; j < len1; j++) {
       usbLine = usbFiles[j];
@@ -112,7 +112,7 @@
         deleteCount++;
         console.log('removing old file:', usbFilePath);
         res = exec(`ssh ${usbHost} rm -rf ${escQuotesS("videos/" + usbFilePath)}`, {
-          timeout: 10000
+          timeout: 300000
         }).toString();
         if (res.length > 1) {
           console.log(res);
@@ -143,7 +143,7 @@
 
   checkFiles = () => {
     usbFiles = exec(findUsb, {
-      timeout: 10000
+      timeout: 300000
     }).toString().split('\n');
     return process.nextTick(checkFile);
   };
@@ -175,7 +175,7 @@
       }
       console.log('>>>>>>', downloadCount, '/', chkCount, errCount, fname);
       guessItRes = exec(`/usr/local/bin/guessit -js '${fname.replace("'", '')}'`, {
-        timeout: 10000
+        timeout: 300000
       }).toString();
       try {
         ({title, season, type} = JSON.parse(guessItRes));
@@ -230,7 +230,7 @@
             return;
           }
           console.log("tvdb err retry, waiting one minute");
-          return setTimeout(chkTvDB, 60 * 1000);
+          return setTimeout(chkTvDB, 300000);
         } else {
           return process.nextTick(badFile);
         }

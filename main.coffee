@@ -79,7 +79,7 @@ request.post 'https://api.thetvdb.com/login',
 
 delOldFiles = =>
   console.log ".... checking for files to delete ...."
-  usbFiles = exec(findUsb, {timeout:10000}).toString().split '\n'
+  usbFiles = exec(findUsb, {timeout:300000}).toString().split '\n'
 
   for usbLine in usbFiles
     usbDate = new Date(usbLine.slice 0,10).getTime()
@@ -88,7 +88,7 @@ delOldFiles = =>
       deleteCount++
       console.log 'removing old file:', usbFilePath
       res = exec("ssh #{usbHost} rm -rf #{escQuotesS "videos/" + usbFilePath}",
-                       {timeout:10000}).toString()
+                       {timeout:300000}).toString()
       if (res.length > 1) then console.log res
 
   recentChgd = no
@@ -109,7 +109,7 @@ title = season = type = null
 tvDbErrCount = 0
 
 checkFiles = =>
-  usbFiles = exec(findUsb, {timeout:10000}).toString().split '\n'
+  usbFiles = exec(findUsb, {timeout:300000}).toString().split '\n'
   process.nextTick checkFile
 
 checkFile = =>
@@ -136,7 +136,7 @@ checkFile = =>
     console.log '>>>>>>', downloadCount,'/', chkCount, errCount, fname
 
     guessItRes = exec("/usr/local/bin/guessit -js '#{fname.replace "'", ''}'",
-                      {timeout:10000}).toString()
+                      {timeout:300000}).toString()
     try
       {title, season, type} = JSON.parse guessItRes
       if not type == 'episode'
@@ -185,7 +185,7 @@ chkTvDB = =>
             console.log 'giving up, downloaded:', downloadCount
             return
           console.log "tvdb err retry, waiting one minute"
-          setTimeout chkTvDB, 60*1000
+          setTimeout chkTvDB, 300000
         else
           process.nextTick badFile
       else

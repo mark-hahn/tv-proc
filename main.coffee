@@ -52,7 +52,8 @@ escQuotesS = (str) ->
            .replace(/\s/g, '\\ ')  + '"'
 
 escQuotes = (str) ->
-  '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'") + '"'
+  '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"'
+  # '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'") + '"'
 
 ################
 # async routines
@@ -214,7 +215,7 @@ checkFileExists = =>
     # console.log escQuotes tvFilePath
     # console.log escQuotes videoPath
     # console.log escQuotes usbLongPath
-    # console.log "\nrsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}\n"
+    console.log "\nrsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}\n"
 
     console.log(exec("rsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}",
                       fileTimeout).toString().replace('\n\n', '\n'),

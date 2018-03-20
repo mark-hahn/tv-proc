@@ -93,7 +93,7 @@ delOldFiles = =>
       if (res.length > 1) then console.log res
 
   recentChgd = no
-  for recentFname, recentTime of recent when recentTime < (Date.now() - recentLimit)
+  for recentFname, recentTime of recent when recentTime < recentLimit
     delete recent[recentFname]
     recentChgd = yes
   if recentChgd

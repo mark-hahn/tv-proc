@@ -124,7 +124,7 @@
     recentChgd = false;
     for (recentFname in recent) {
       recentTime = recent[recentFname];
-      if (!(recentTime < (Date.now() - recentLimit))) {
+      if (!(recentTime < recentLimit)) {
         continue;
       }
       delete recent[recentFname];

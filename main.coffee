@@ -11,18 +11,25 @@ mkdirp = require 'mkdirp'
 request = require 'request'
 rimraf  = require 'rimraf'
 
-usbHost = fileRegex = null
+usbHost = fileRegex = filterRegex = null
 
 if process.argv.length == 3
   fileRegex = process.argv[2]
 else
   usbHost = process.argv[2] + '@' + process.argv[3]
 
+if process.argv.length == 5
+  filterRegex = process.argv[4]
+
 console.log ".... starting tv.coffee for #{usbHost || fileRegex} ...."
 startTime = time = Date.now()
 deleteCount = chkCount = recentCount = existsCount = errCount = downloadCount = 0;
 
 findUsb = "ssh #{usbHost} find videos -type f -printf '%CY-%Cm-%Cd-%P\\\\\\n'"
+if filterRegex
+  findUsb += " | grep " + filterRegex
+
+console.log findUsb
 
 ###########
 # constants
@@ -215,7 +222,7 @@ checkFileExists = =>
     # console.log escQuotes tvFilePath
     # console.log escQuotes videoPath
     # console.log escQuotes usbLongPath
-    console.log "\nrsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}\n"
+    # console.log "\nrsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}\n"
 
     console.log(exec("rsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}",
                       fileTimeout).toString().replace('\n\n', '\n'),

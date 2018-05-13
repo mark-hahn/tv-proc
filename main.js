@@ -4,7 +4,7 @@
   //  lazy-login to thetvdb
   //  add episode dupes to counter summary
   //  move episode dupes code to this file
-  var badFile, checkFile, checkFileExists, checkFiles, chkCount, chkTvDB, delOldFiles, deleteCount, downloadCount, errCount, errors, escQuotes, escQuotesS, exec, existsCount, f, fileRegex, fileTimeout, findUsb, fname, fs, getUsbFiles, i, len, line, map, mapLines, mapStr, mkdirp, recent, recentCount, recentLimit, request, rimraf, season, seriesName, startTime, t, theTvDbToken, time, title, tvDbErrCount, tvPath, tvdbCache, type, usbAgeLimit, usbFilePath, usbFiles, usbHost, util;
+  var badFile, checkFile, checkFileExists, checkFiles, chkCount, chkTvDB, delOldFiles, deleteCount, downloadCount, errCount, errors, escQuotes, escQuotesS, exec, existsCount, f, fileRegex, fileTimeout, filterRegex, findUsb, fname, fs, getUsbFiles, i, len, line, map, mapLines, mapStr, mkdirp, recent, recentCount, recentLimit, request, rimraf, season, seriesName, startTime, t, theTvDbToken, time, title, tvDbErrCount, tvPath, tvdbCache, type, usbAgeLimit, usbFilePath, usbFiles, usbHost, util;
 
   fs = require('fs-plus');
 
@@ -18,12 +18,16 @@
 
   rimraf = require('rimraf');
 
-  usbHost = fileRegex = null;
+  usbHost = fileRegex = filterRegex = null;
 
   if (process.argv.length === 3) {
     fileRegex = process.argv[2];
   } else {
     usbHost = process.argv[2] + '@' + process.argv[3];
+  }
+
+  if (process.argv.length === 5) {
+    filterRegex = process.argv[4];
   }
 
   console.log(`.... starting tv.coffee for ${usbHost || fileRegex} ....`);
@@ -33,6 +37,12 @@
   deleteCount = chkCount = recentCount = existsCount = errCount = downloadCount = 0;
 
   findUsb = `ssh ${usbHost} find videos -type f -printf '%CY-%Cm-%Cd-%P\\\\\\n'`;
+
+  if (filterRegex) {
+    findUsb += " | grep " + filterRegex;
+  }
+
+  console.log(findUsb);
 
   //##########
   // constants
@@ -268,7 +278,7 @@
       // console.log escQuotes tvFilePath
       // console.log escQuotes videoPath
       // console.log escQuotes usbLongPath
-      console.log(`\nrsync -av ${escQuotesS(usbLongPath)} ${escQuotes(tvFilePath)}\n`);
+      // console.log "\nrsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}\n"
       console.log(exec(`rsync -av ${escQuotesS(usbLongPath)} ${escQuotes(tvFilePath)}`, fileTimeout).toString().replace('\n\n', '\n'), ((Date.now() - time) / 1000).toFixed(0) + ' secs');
       downloadCount++;
       time = Date.now();

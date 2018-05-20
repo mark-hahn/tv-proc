@@ -29,8 +29,6 @@ findUsb = "ssh #{usbHost} find videos -type f -printf '%CY-%Cm-%Cd-%P\\\\\\n'"
 if filterRegex
   findUsb += " | grep " + filterRegex
 
-console.log findUsb
-
 ###########
 # constants
 
@@ -97,7 +95,6 @@ delOldFiles = =>
       console.log 'removing old file:', usbFilePath
       res = exec("ssh #{usbHost} rm -rf #{escQuotesS "videos/" + usbFilePath}",
                        {timeout:300000}).toString()
-      if (res.length > 1) then console.log res
 
   recentChgd = no
   for recentFname, recentTime of recent when recentTime < recentLimit
@@ -224,9 +221,9 @@ checkFileExists = =>
     # console.log escQuotes usbLongPath
     # console.log "\nrsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}\n"
 
-    console.log(exec("rsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}",
-                      fileTimeout).toString().replace('\n\n', '\n'),
-                    ((Date.now() - time)/1000).toFixed(0) + ' secs')
+    # console.log(exec("rsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}",
+    #                   fileTimeout).toString().replace('\n\n', '\n'),
+    #                 ((Date.now() - time)/1000).toFixed(0) + ' secs')
     downloadCount++
     time = Date.now()
 

@@ -109,7 +109,7 @@
   // delete old files in usb/videos
   delOldFiles = () => {
     var j, len1, recentChgd, recentFname, recentTime, res, usbDate, usbFilePath, usbFiles, usbLine;
-    console.log(".... checking for files to delete ....");
+    // console.log ".... checking for files to delete ...."
     usbFiles = exec(findUsb, {
       timeout: 300000
     }).toString().split('\n');

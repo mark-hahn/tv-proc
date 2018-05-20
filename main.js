@@ -30,8 +30,7 @@
     filterRegex = process.argv[4];
   }
 
-  console.log(`.... starting tv.coffee for ${usbHost || fileRegex} ....`);
-
+  // console.log ".... starting tv.coffee for #{usbHost || fileRegex} ...."
   startTime = time = Date.now();
 
   deleteCount = chkCount = recentCount = existsCount = errCount = downloadCount = 0;
@@ -138,7 +137,6 @@
     if (recentChgd) {
       fs.writeFileSync('tv-recent', JSON.stringify(recent));
     }
-    console.log(".... downloading files ....");
     return process.nextTick(checkFiles);
   };
 
@@ -203,8 +201,22 @@
       }
       return process.nextTick(chkTvDB);
     } else {
-      console.log('.... done ....');
-      console.log('skipped recent:  ', recentCount, '\ndeleted:         ', deleteCount, '\nskipped existing:', existsCount, '\nerrors:          ', errCount, '\ndownloaded:      ', downloadCount, '\nelapsed(mins):   ', ((Date.now() - startTime) / (60 * 1000)).toFixed(1));
+      // console.log '.... done ....'
+      // if (recentCount > 0)
+      //   console.log  'skipped recent:  ', recentCount
+      if (deleteCount > 0) {
+        console.log('deleted:         ', deleteCount);
+      }
+      if (existsCount > 0) {
+        console.log('skipped existing:', existsCount);
+      }
+      if (errCount > 0) {
+        console.log('errors:          ', errCount);
+      }
+      if (downloadCount > 0) {
+        console.log('downloaded:      ', downloadCount);
+      }
+      console.log('elapsed(mins):   ', ((Date.now() - startTime) / (60 * 1000)).toFixed(1));
       if (deleteCount + existsCount + errCount + downloadCount > 0) {
         return console.log("***********************************************************");
       }
@@ -264,11 +276,10 @@
       console.log(`skipping existing file: ${fname}`);
     } else {
       mkdirp.sync(tvSeasonPath);
-      if (usbFilePath.indexOf('/') > -1) {
-        console.log(`downloading file in dir: ${usbFilePath}`);
-      } else {
-        console.log(`downloading file: ${usbFilePath}`);
-      }
+      // if usbFilePath.indexOf('/') > -1
+      //   console.log "downloading file in dir: #{usbFilePath}"
+      // else
+      //   console.log "downloading file: #{usbFilePath}"
       // console.log escQuotes tvSeasonPath
       // console.log escQuotes tvFilePath
       // console.log escQuotes videoPath

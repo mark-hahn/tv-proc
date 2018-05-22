@@ -147,9 +147,14 @@
   tvDbErrCount = 0;
 
   checkFiles = () => {
+    var ref;
     usbFiles = exec(findUsb, {
       timeout: 300000
     }).toString().split('\n');
+    console.log('xxx', process.argv.length);
+    if ((ref = process.argv.length) === 3 || ref === 5) {
+      console.log(usbFiles);
+    }
     return process.nextTick(checkFile);
   };
 

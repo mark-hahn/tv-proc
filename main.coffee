@@ -114,6 +114,9 @@ tvDbErrCount = 0
 
 checkFiles = =>
   usbFiles = exec(findUsb, {timeout:300000}).toString().split '\n'
+  console.log 'xxx', process.argv.length
+  if process.argv.length in [3,5]
+    console.log usbFiles
   process.nextTick checkFile
 
 checkFile = =>

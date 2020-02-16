@@ -21,7 +21,7 @@ else
 if process.argv.length == 5
   filterRegex = process.argv[4]
 
-# console.log ".... starting tv.coffee for #{usbHost || fileRegex} ...."
+console.log ".... starting tv.coffee v2 for #{usbHost || fileRegex} ...."
 startTime = time = Date.now()
 deleteCount = chkCount = recentCount = existsCount = errCount = downloadCount = 0;
 
@@ -39,7 +39,7 @@ for line in mapLines
   [f,t] = line.split ','
   if line.length then map[f.trim()] = t.trim()
 
-recent = JSON.parse fs.readFileSync 'tv-recent', 'utf8'
+recent = JSON.parse fs.readFileSync 'tv-recent.json', 'utf8'
 errors = JSON.parse fs.readFileSync 'tv-errors', 'utf8'
 
 tvPath    = '/mnt/media/tv/'
@@ -101,7 +101,7 @@ delOldFiles = =>
     delete recent[recentFname]
     recentChgd = yes
   if recentChgd
-    fs.writeFileSync 'tv-recent', JSON.stringify recent
+    fs.writeFileSync 'tv-recent.json', JSON.stringify recent
 
   process.nextTick checkFiles
 
@@ -114,7 +114,6 @@ tvDbErrCount = 0
 
 checkFiles = =>
   usbFiles = exec(findUsb, {timeout:300000}).toString().split '\n'
-  console.log 'xxx', process.argv.length
   if process.argv.length in [3,5]
     console.log usbFiles
   process.nextTick checkFile
@@ -160,9 +159,9 @@ checkFile = =>
       return
     process.nextTick chkTvDB
   else
-    # console.log '.... done ....'
-    # if (recentCount > 0)
-    #   console.log  'skipped recent:  ', recentCount
+    console.log '.... done ....'
+    if (recentCount > 0)
+      console.log  'skipped recent:  ', recentCount
     if (deleteCount > 0)
       console.log  'deleted:         ', deleteCount
     if (existsCount > 0)
@@ -215,27 +214,27 @@ checkFileExists = =>
   usbLongPath  = "#{usbHost}:#{videoPath}"
   if fs.existsSync tvFilePath
     existsCount++
-    console.log "skipping existing file: #{fname}"
+    console.log "... skipping existing file ..."
   else
     mkdirp.sync tvSeasonPath
-    # if usbFilePath.indexOf('/') > -1
-    #   console.log "downloading file in dir: #{usbFilePath}"
-    # else
-    #   console.log "downloading file: #{usbFilePath}"
+    if usbFilePath.indexOf('/') > -1
+      console.log "... downloading file (dir: #{usbFilePath}) ..."
+    else
+      console.log "... downloading file ..."
     # console.log escQuotes tvSeasonPath
     # console.log escQuotes tvFilePath
     # console.log escQuotes videoPath
     # console.log escQuotes usbLongPath
     # console.log "\nrsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}\n"
 
-    # console.log(exec("rsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}",
-    #                   fileTimeout).toString().replace('\n\n', '\n'),
-    #                 ((Date.now() - time)/1000).toFixed(0) + ' secs')
+    console.log(exec("rsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}",
+                      fileTimeout).toString().replace('\n\n', '\n'),
+                    ((Date.now() - time)/1000).toFixed(0) + ' secs')
     downloadCount++
     time = Date.now()
 
   recent[fname] = Date.now()
-  fs.writeFileSync 'tv-recent', JSON.stringify recent
+  fs.writeFileSync 'tv-recent.json', JSON.stringify recent
   process.nextTick checkFile
 
 badFile = =>

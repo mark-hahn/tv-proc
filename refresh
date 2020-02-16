@@ -1,0 +1,4 @@
+service emby-server restart
+chown -R emby:root /mnt/media/tv/*
+chmod -R 774       /mnt/media/tv/*
+

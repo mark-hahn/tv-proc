@@ -1,0 +1,8 @@
+unset PATH
+/usr/bin/find /mnt/media/tv -type f -name '*.rar' -exec rm {} \; 
+/usr/bin/find /mnt/media/tv -type f -name '*.r[0-9][0-9]' -exec rm {} \; 
+/usr/bin/find /mnt/media/tv -type f -name '*.srr' -exec rm {} \; 
+/usr/bin/find /mnt/media/tv -type f -name '*.nfo' -exec rm {} \; 
+/usr/bin/find /mnt/media/tv -type f -name '*.sfv' -exec rm {} \; 
+/usr/bin/find /mnt/media/tv -type f -name '*sample.mkv' -exec rm {} \; 
+

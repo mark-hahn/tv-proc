@@ -1,8 +1,21 @@
+# unrarTV
+# unset PATH
+# /usr/bin/find /mnt/media/tv -name '*.rar' -exec ~/dev/apps/tv-proc/rar e -o- {} \;
+
+# rmrarTV
+# unset PATH
+# /usr/bin/find /mnt/media/tv -type f -name '*.rar' -exec rm {} \;
+# /usr/bin/find /mnt/media/tv -type f -name '*.r[0-9][0-9]*' -exec rm {} \;
+
 
 #todo
 #  lazy-login to thetvdb
 #  add episode dupes to counter summary
 #  move episode dupes code to this file
+
+usbAgeLimit = Date.now() - 8*7*24*60*60*1000 # 8 weeks ago
+recentLimit = Date.now() - 9*7*24*60*60*1000 # 9 weeks ago
+fileTimeout = {timeout: 2*60*60*1000} # 2 hours
 
 fs   = require 'fs-plus'
 util = require 'util'
@@ -25,7 +38,7 @@ console.log ".... starting tv.coffee v2 for #{usbHost || fileRegex} ...."
 startTime = time = Date.now()
 deleteCount = chkCount = recentCount = existsCount = errCount = downloadCount = 0;
 
-findUsb = "ssh #{usbHost} find videos -type f -printf '%CY-%Cm-%Cd-%P\\\\\\n'"
+findUsb = "ssh #{usbHost} find files -type f -printf '%CY-%Cm-%Cd-%P\\\\\\n'"
 if filterRegex
   findUsb += " | grep " + filterRegex
 
@@ -43,10 +56,6 @@ recent = JSON.parse fs.readFileSync 'tv-recent.json', 'utf8'
 errors = JSON.parse fs.readFileSync 'tv-errors', 'utf8'
 
 tvPath    = '/mnt/media/tv/'
-
-usbAgeLimit = Date.now() - 2*7*24*60*60*1000 # 2 weeks ago
-recentLimit = Date.now() - 3*7*24*60*60*1000 # 3 weeks ago
-fileTimeout = {timeout: 2*60*60*1000} # 2 hours
 
 escQuotesS = (str) ->
   '"' + str.replace(/\\/g, '\\\\')
@@ -73,15 +82,15 @@ request.post 'https://api.thetvdb.com/login',
   {json:true, body: {apikey: "2C92771D87CA8718"}},
   (error, response, body) =>
     if error or response.statusCode != 200
-      console.log 'theTvDb login error:', error
-      console.log 'theTvDb statusCode:', response && response.statusCode
+      console.error 'theTvDb login error:', error
+      console.error 'theTvDb statusCode:', response && response.statusCode
       process.exit()
     else
       theTvDbToken = body.token
       process.nextTick delOldFiles
 
 ######################################################
-# delete old files in usb/videos
+# delete old files in usb/files
 
 delOldFiles = =>
   # console.log ".... checking for files to delete ...."
@@ -93,7 +102,7 @@ delOldFiles = =>
       usbFilePath = usbLine.slice 11
       deleteCount++
       console.log 'removing old file:', usbFilePath
-      res = exec("ssh #{usbHost} rm -rf #{escQuotesS "videos/" + usbFilePath}",
+      res = exec("ssh #{usbHost} rm -rf #{escQuotesS "files/" + usbFilePath}",
                        {timeout:300000}).toString()
 
   recentChgd = no
@@ -141,8 +150,9 @@ checkFile = =>
       return
     console.log '>>>>>>', downloadCount,'/', chkCount, errCount, fname
 
-    guessItRes = exec("/usr/local/bin/guessit -js '#{fname.replace "'", ''}'",
+    guessItRes = exec("/usr/local/bin/guessit -js '#{fname.replace /'/g, ''}'",
                       {timeout:300000}).toString()
+    # console.log {guessItRes}
     try
       {title, season, type} = JSON.parse guessItRes
       if not type == 'episode'
@@ -154,7 +164,7 @@ checkFile = =>
         process.nextTick badFile
         return
     catch
-      console.log '\nerror parsing:' + fname
+      console.error '\nerror parsing:' + fname
       process.nextTick badFile
       return
     process.nextTick chkTvDB
@@ -174,6 +184,10 @@ checkFile = =>
                ((Date.now()-startTime)/(60*1000)).toFixed(1)
     if deleteCount + existsCount + errCount + downloadCount > 0
       console.log "***********************************************************"
+
+    exec "/root/dev/apps/tv-proc/unrarTV"
+    exec "/root/dev/apps/tv-proc/rmrarTV"
+
 tvdbCache = {}
 
 chkTvDB = =>
@@ -185,17 +199,17 @@ chkTvDB = =>
   request 'https://api.thetvdb.com/search/series?name=' + encodeURIComponent(title),
     {json:true, headers: {Authorization: 'Bearer ' + theTvDbToken}},
     (error, response, body) =>
-      # console.log {error, response, body}
+      # console.log 'thetvdb', {error, response, body}
       if error or (response?.statusCode != 200)
-        console.log 'no series name found in theTvDB:', fname
-        console.log 'search error:', error
-        console.log 'search statusCode:', response && response.statusCode
-        console.log 'search body:', body
+        console.error 'no series name found in theTvDB:', fname
+        console.error 'search error:', error
+        console.error 'search statusCode:', response && response.statusCode
+        console.error 'search body:', body
         if error
           if ++tvDbErrCount == 15
-            console.log 'giving up, downloaded:', downloadCount
+            console.error 'giving up, downloaded:', downloadCount
             return
-          console.log "tvdb err retry, waiting one minute"
+          console.error "tvdb err retry, waiting one minute"
           setTimeout chkTvDB, 300000
         else
           process.nextTick badFile
@@ -210,7 +224,7 @@ chkTvDB = =>
 checkFileExists = =>
   tvSeasonPath = "#{tvPath}#{seriesName}/Season #{season}"
   tvFilePath   = "#{tvSeasonPath}/#{fname}"
-  videoPath    = "videos/#{usbFilePath}"
+  videoPath    = "files/#{usbFilePath}"
   usbLongPath  = "#{usbHost}:#{videoPath}"
   if fs.existsSync tvFilePath
     existsCount++

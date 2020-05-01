@@ -1,17 +1,10 @@
-# unrarTV
-# unset PATH
-# /usr/bin/find /mnt/media/tv -name '*.rar' -exec ~/dev/apps/tv-proc/rar e -o- {} \;
-
-# rmrarTV
-# unset PATH
-# /usr/bin/find /mnt/media/tv -type f -name '*.rar' -exec rm {} \;
-# /usr/bin/find /mnt/media/tv -type f -name '*.r[0-9][0-9]*' -exec rm {} \;
-
 
 #todo
 #  lazy-login to thetvdb
 #  add episode dupes to counter summary
 #  move episode dupes code to this file
+
+usbHost =  "xobtlu@lw987.usbx.me"
 
 usbAgeLimit = Date.now() - 8*7*24*60*60*1000 # 8 weeks ago
 recentLimit = Date.now() - 9*7*24*60*60*1000 # 9 weeks ago
@@ -24,21 +17,18 @@ mkdirp = require 'mkdirp'
 request = require 'request'
 rimraf  = require 'rimraf'
 
-usbHost = fileRegex = filterRegex = null
-
+filterRegex = null
+filterRegexTxt = ''
 if process.argv.length == 3
-  fileRegex = process.argv[2]
-else
-  usbHost = process.argv[2] + '@' + process.argv[3]
+  filterRegex = process.argv[2]
+  filterRegexTxt = 'filter:' + filterRegex
 
-if process.argv.length == 5
-  filterRegex = process.argv[4]
-
-console.log ".... starting tv.coffee v2 for #{usbHost || fileRegex} ...."
+console.log ".... starting tv.coffee v3 #{filterRegexTxt} ...."
 startTime = time = Date.now()
 deleteCount = chkCount = recentCount = existsCount = errCount = downloadCount = 0;
 
-findUsb = "ssh #{usbHost} find files -type f -printf '%CY-%Cm-%Cd-%P\\\\\\n'"
+findUsb = "ssh #{usbHost} find files -type f -printf '%CY-%Cm-%Cd-%P\\\\\\n' | grep -v .r[0-9][0-9]$ | grep -v .rar$"
+
 if filterRegex
   findUsb += " | grep " + filterRegex
 
@@ -123,7 +113,7 @@ tvDbErrCount = 0
 
 checkFiles = =>
   usbFiles = exec(findUsb, {timeout:300000}).toString().split '\n'
-  if process.argv.length in [3,5]
+  if filterRegex
     console.log usbFiles
   process.nextTick checkFile
 
@@ -184,9 +174,6 @@ checkFile = =>
                ((Date.now()-startTime)/(60*1000)).toFixed(1)
     if deleteCount + existsCount + errCount + downloadCount > 0
       console.log "***********************************************************"
-
-    exec "/root/dev/apps/tv-proc/unrarTV"
-    exec "/root/dev/apps/tv-proc/rmrarTV"
 
 tvdbCache = {}
 

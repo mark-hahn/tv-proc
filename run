@@ -5,7 +5,7 @@ fi
 cd /root/dev/apps/tv-proc
 echo >> /root/dev/apps/tv-proc/tv.log
 date >> /root/dev/apps/tv-proc/tv.log
-/root/.nvm/versions/node/v10.15.3/bin/node /root/dev/apps/tv-proc/main.js xobtlu lw987.usbx.me
+/root/.nvm/versions/node/v10.15.3/bin/node /root/dev/apps/tv-proc/main.js $1
 chmod -R 774  /mnt/media/tv
 chown -R emby /mnt/media/tv
 /root/.nvm/versions/node/v10.15.3/bin/node /root/dev/apps/tv-proc/prune-dupes.js

@@ -6,8 +6,8 @@
 
 usbHost =  "xobtlu@lw987.usbx.me"
 
-usbAgeLimit = Date.now() - 8*7*24*60*60*1000 # 8 weeks ago
-recentLimit = Date.now() - 9*7*24*60*60*1000 # 9 weeks ago
+usbAgeLimit = Date.now() - 4*7*24*60*60*1000 # 4 weeks ago
+recentLimit = Date.now() - 5*7*24*60*60*1000 # 5 weeks ago
 fileTimeout = {timeout: 2*60*60*1000} # 2 hours
 
 fs   = require 'fs-plus'
@@ -53,6 +53,7 @@ escQuotesS = (str) ->
            .replace(/'/g,  "\\'")
            .replace(/\(/g, "\\(")
            .replace(/\)/g, "\\)")
+           .replace(/\&/g, "\\&")
            .replace(/\s/g, '\\ ')  + '"'
 
 escQuotes = (str) ->
@@ -87,6 +88,12 @@ delOldFiles = =>
   usbFiles = exec(findUsb, {timeout:300000}).toString().split '\n'
 
   for usbLine in usbFiles
+    debug = false
+
+    if usbLine.indexOf('horty') > -1
+      console.log 'DEBUG:', usbLine
+      debug = true
+    
     usbDate = new Date(usbLine.slice 0,10).getTime()
     if usbDate < usbAgeLimit
       usbFilePath = usbLine.slice 11

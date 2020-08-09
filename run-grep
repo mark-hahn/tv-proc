@@ -9,4 +9,4 @@ echo >> /root/dev/apps/tv-proc/tv.log
 echo "====== Getting files with regex \"$1\" ======"
 date >> /root/dev/apps/tv-proc/tv.log
 /root/.nvm/versions/node/v8.11.2/bin/node                                \
-          /root/dev/apps/tv-proc/main.js xobtlu lw987.usbx.me "$1"
+          /root/dev/apps/tv-proc/main.js xobtlu lw987.usbx.me "$1

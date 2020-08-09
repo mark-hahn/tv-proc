@@ -8,9 +8,9 @@
 
   usbHost = "xobtlu@lw987.usbx.me";
 
-  usbAgeLimit = Date.now() - 8 * 7 * 24 * 60 * 60 * 1000; // 8 weeks ago
+  usbAgeLimit = Date.now() - 4 * 7 * 24 * 60 * 60 * 1000; // 4 weeks ago
 
-  recentLimit = Date.now() - 9 * 7 * 24 * 60 * 60 * 1000; // 9 weeks ago
+  recentLimit = Date.now() - 5 * 7 * 24 * 60 * 60 * 1000; // 5 weeks ago
 
   fileTimeout = {
     timeout: 2 * 60 * 60 * 1000 // 2 hours
@@ -72,7 +72,7 @@
   tvPath = '/mnt/media/tv/';
 
   escQuotesS = function(str) {
-    return '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'").replace(/\(/g, "\\(").replace(/\)/g, "\\)").replace(/\s/g, '\\ ') + '"';
+    return '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'").replace(/\(/g, "\\(").replace(/\)/g, "\\)").replace(/\&/g, "\\&").replace(/\s/g, '\\ ') + '"';
   };
 
   escQuotes = function(str) {
@@ -108,13 +108,18 @@
   //#####################################################
   // delete old files in usb/files
   delOldFiles = () => {
-    var j, len1, recentChgd, recentFname, recentTime, res, usbDate, usbFilePath, usbFiles, usbLine;
+    var debug, j, len1, recentChgd, recentFname, recentTime, res, usbDate, usbFilePath, usbFiles, usbLine;
     // console.log ".... checking for files to delete ...."
     usbFiles = exec(findUsb, {
       timeout: 300000
     }).toString().split('\n');
     for (j = 0, len1 = usbFiles.length; j < len1; j++) {
       usbLine = usbFiles[j];
+      debug = false;
+      if (usbLine.indexOf('horty') > -1) {
+        console.log('DEBUG:', usbLine);
+        debug = true;
+      }
       usbDate = new Date(usbLine.slice(0, 10)).getTime();
       if (usbDate < usbAgeLimit) {
         usbFilePath = usbLine.slice(11);
@@ -194,9 +199,8 @@
           return;
         }
         if (!Number.isInteger(season)) {
-          console.log('\nno season integer for ' + fname);
-          process.nextTick(badFile);
-          return;
+          console.log('\nno season integer for ' + fname + ', defaulting to season 1');
+          season = 1;
         }
       } catch (error1) {
         console.error('\nerror parsing:' + fname);
@@ -231,18 +235,20 @@
   tvdbCache = {};
 
   chkTvDB = () => {
+    var tvdburl;
     if (tvdbCache[title]) {
       seriesName = tvdbCache[title];
       process.nextTick(checkFileExists);
       return;
     }
-    return request('https://api.thetvdb.com/search/series?name=' + encodeURIComponent(title), {
+    tvdburl = 'https://api.thetvdb.com/search/series?name=' + encodeURIComponent(title);
+    return request(tvdburl, {
       json: true,
       headers: {
         Authorization: 'Bearer ' + theTvDbToken
       }
     }, (error, response, body) => {
-      // console.log 'thetvdb', {error, response, body}
+      // console.log 'thetvdb', {tvdburl, error, response, body}
       if (error || ((response != null ? response.statusCode : void 0) !== 200)) {
         console.error('no series name found in theTvDB:', fname);
         console.error('search error:', error);

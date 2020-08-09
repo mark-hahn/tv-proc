@@ -157,9 +157,8 @@ checkFile = =>
         process.nextTick badFile
         return
       if not Number.isInteger season
-        console.log '\nno season integer for ' + fname
-        process.nextTick badFile
-        return
+        console.log '\nno season integer for ' + fname + ', defaulting to season 1'
+        season = 1
     catch
       console.error '\nerror parsing:' + fname
       process.nextTick badFile
@@ -189,11 +188,11 @@ chkTvDB = =>
     seriesName = tvdbCache[title]
     process.nextTick checkFileExists
     return
-
-  request 'https://api.thetvdb.com/search/series?name=' + encodeURIComponent(title),
+  tvdburl = 'https://api.thetvdb.com/search/series?name=' + encodeURIComponent(title)
+  request tvdburl,
     {json:true, headers: {Authorization: 'Bearer ' + theTvDbToken}},
     (error, response, body) =>
-      # console.log 'thetvdb', {error, response, body}
+      # console.log 'thetvdb', {tvdburl, error, response, body}
       if error or (response?.statusCode != 200)
         console.error 'no series name found in theTvDB:', fname
         console.error 'search error:', error

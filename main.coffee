@@ -6,8 +6,8 @@
 
 usbHost =  "xobtlu@lw987.usbx.me"
 
-usbAgeLimit = Date.now() - 4*7*24*60*60*1000 # 4 weeks ago
-recentLimit = Date.now() - 5*7*24*60*60*1000 # 5 weeks ago
+usbAgeLimit = Date.now() - 2*7*24*60*60*1000 # 2 weeks ago
+recentLimit = Date.now() - 3*7*24*60*60*1000 # 3 weeks ago
 fileTimeout = {timeout: 2*60*60*1000} # 2 hours
 
 fs   = require 'fs-plus'

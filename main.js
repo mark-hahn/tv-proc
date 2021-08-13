@@ -6,11 +6,11 @@
   //  move episode dupes code to this file
   var badFile, checkFile, checkFileExists, checkFiles, chkCount, chkTvDB, delOldFiles, deleteCount, downloadCount, errCount, errors, escQuotes, escQuotesS, exec, existsCount, f, fileTimeout, filterRegex, filterRegexTxt, findUsb, fname, fs, getUsbFiles, i, len, line, map, mapLines, mapStr, mkdirp, recent, recentCount, recentLimit, request, rimraf, season, seriesName, startTime, t, theTvDbToken, time, title, tvDbErrCount, tvPath, tvdbCache, type, usbAgeLimit, usbFilePath, usbFiles, usbHost, util;
 
-  usbHost = "xobtlu@lw987.usbx.me";
+  usbHost = "xobtlu@oracle.usbx.me";
 
-  usbAgeLimit = Date.now() - 4 * 7 * 24 * 60 * 60 * 1000; // 4 weeks ago
+  usbAgeLimit = Date.now() - 2 * 7 * 24 * 60 * 60 * 1000; // 2 weeks ago
 
-  recentLimit = Date.now() - 5 * 7 * 24 * 60 * 60 * 1000; // 5 weeks ago
+  recentLimit = Date.now() - 3 * 7 * 24 * 60 * 60 * 1000; // 3 weeks ago
 
   fileTimeout = {
     timeout: 2 * 60 * 60 * 1000 // 2 hours

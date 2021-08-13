@@ -4,7 +4,7 @@
 #  add episode dupes to counter summary
 #  move episode dupes code to this file
 
-usbHost =  "xobtlu@lw987.usbx.me"
+usbHost =  "xobtlu@oracle.usbx.me"
 
 usbAgeLimit = Date.now() - 2*7*24*60*60*1000 # 2 weeks ago
 recentLimit = Date.now() - 3*7*24*60*60*1000 # 3 weeks ago

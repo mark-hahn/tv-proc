@@ -6,7 +6,7 @@
   //  move episode dupes code to this file
 
   // debug = true
-  var badFile, blocked, blockedCount, checkFile, checkFileExists, checkFiles, chkCount, chkTvDB, delOldFiles, deleteCount, downloadCount, errCount, errors, escQuotes, escQuotesS, exec, existsCount, f, fileTimeout, filterRegex, filterRegexTxt, findUsb, fname, fs, getUsbFiles, i, len, line, map, mapLines, mapStr, mkdirp, recent, recentCount, recentLimit, request, rimraf, season, seriesName, startTime, t, theTvDbToken, time, title, tvDbErrCount, tvDbPin, tvPath, tvdbCache, type, usbAgeLimit, usbFilePath, usbFiles, usbHost, util;
+  var badFile, blocked, blockedCount, checkFile, checkFileExists, checkFiles, chkCount, chkTvDB, delOldFiles, deleteCount, downloadCount, errCount, errors, escQuotes, escQuotesS, exec, existsCount, f, fileTimeout, filterRegex, filterRegexTxt, findUsb, fname, fs, getUsbFiles, i, len, line, map, mapLines, mapStr, mkdirp, recent, recentCount, recentLimit, request, rimraf, season, seriesName, startTime, t, theTvDbToken, time, title, tvDbErrCount, tvPath, tvdbCache, type, usbAgeLimit, usbFilePath, usbFiles, usbHost, util;
 
   usbHost = "xobtlu@oracle.usbx.me";
 
@@ -95,14 +95,10 @@
   // get the api token
   theTvDbToken = null;
 
-  tvDbPin = 'HXEVSDFF';
-
-  // old apiKey = 'ad42c85592acd18e340c8f371f47b29f'
-  // v4 legacy type api key = 'ad42c85592acd18e340c8f371f47b29f'
-  request.post('https://api4.thetvdb.com/v4/login', {
+  request.post('https://api.thetvdb.com/login', {
     json: true,
     body: {
-      pin: tvDbPin
+      apikey: "2C92771D87CA8718"
     }
   }, (error, response, body) => {
     if (error || response.statusCode !== 200) {
@@ -111,10 +107,9 @@
       return process.exit();
     } else {
       theTvDbToken = body.token;
-      if (debug) {
-        console.log('tvdb login', {error, response, body});
-        process.exit();
-      }
+      // if debug
+      //   console.log 'tvdb login', {error, response, body}
+      //   process.exit()
       return process.nextTick(delOldFiles);
     }
   });

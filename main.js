@@ -4,7 +4,9 @@
   //  lazy-login to thetvdb
   //  add episode dupes to counter summary
   //  move episode dupes code to this file
-  var badFile, checkFile, checkFileExists, checkFiles, chkCount, chkTvDB, delOldFiles, deleteCount, downloadCount, errCount, errors, escQuotes, escQuotesS, exec, existsCount, f, fileTimeout, filterRegex, filterRegexTxt, findUsb, fname, fs, getUsbFiles, i, len, line, map, mapLines, mapStr, mkdirp, recent, recentCount, recentLimit, request, rimraf, season, seriesName, startTime, t, theTvDbToken, time, title, tvDbErrCount, tvPath, tvdbCache, type, usbAgeLimit, usbFilePath, usbFiles, usbHost, util;
+
+  // debug = true
+  var badFile, blocked, blockedCount, checkFile, checkFileExists, checkFiles, chkCount, chkTvDB, delOldFiles, deleteCount, downloadCount, errCount, errors, escQuotes, escQuotesS, exec, existsCount, f, fileTimeout, filterRegex, filterRegexTxt, findUsb, fname, fs, getUsbFiles, i, len, line, map, mapLines, mapStr, mkdirp, recent, recentCount, recentLimit, request, rimraf, season, seriesName, startTime, t, theTvDbToken, time, title, tvDbErrCount, tvDbPin, tvPath, tvdbCache, type, usbAgeLimit, usbFilePath, usbFiles, usbHost, util;
 
   usbHost = "xobtlu@oracle.usbx.me";
 
@@ -41,7 +43,9 @@
 
   startTime = time = Date.now();
 
-  deleteCount = chkCount = recentCount = existsCount = errCount = downloadCount = 0;
+  deleteCount = chkCount = recentCount = 0;
+
+  existsCount = errCount = downloadCount = blockedCount = 0;
 
   findUsb = `ssh ${usbHost} find files -type f -printf '%CY-%Cm-%Cd-%P\\\\\\n' | grep -v .r[0-9][0-9]$ | grep -v .rar$`;
 
@@ -65,6 +69,8 @@
     }
   }
 
+  blocked = JSON.parse(fs.readFileSync('tv-blocked.json', 'utf8'));
+
   recent = JSON.parse(fs.readFileSync('tv-recent.json', 'utf8'));
 
   errors = JSON.parse(fs.readFileSync('tv-errors', 'utf8'));
@@ -86,13 +92,17 @@
   getUsbFiles = delOldFiles = checkFiles = checkFile = badFile = checkFileExists = checkFile = chkTvDB = null;
 
   //######################################
-  // get theTvDb api token
+  // get the api token
   theTvDbToken = null;
 
-  request.post('https://api.thetvdb.com/login', {
+  tvDbPin = 'HXEVSDFF';
+
+  // old apiKey = 'ad42c85592acd18e340c8f371f47b29f'
+  // v4 legacy type api key = 'ad42c85592acd18e340c8f371f47b29f'
+  request.post('https://api4.thetvdb.com/v4/login', {
     json: true,
     body: {
-      apikey: "2C92771D87CA8718"
+      pin: tvDbPin
     }
   }, (error, response, body) => {
     if (error || response.statusCode !== 200) {
@@ -101,6 +111,10 @@
       return process.exit();
     } else {
       theTvDbToken = body.token;
+      if (debug) {
+        console.log('tvdb login', {error, response, body});
+        process.exit();
+      }
       return process.nextTick(delOldFiles);
     }
   });
@@ -116,10 +130,9 @@
     for (j = 0, len1 = usbFiles.length; j < len1; j++) {
       usbLine = usbFiles[j];
       debug = false;
-      if (usbLine.indexOf('horty') > -1) {
-        console.log('DEBUG:', usbLine);
-        debug = true;
-      }
+      // if usbLine.indexOf('horty') > -1
+      //   console.log 'DEBUG:', usbLine
+      //   debug = true
       usbDate = new Date(usbLine.slice(0, 10)).getTime();
       if (usbDate < usbAgeLimit) {
         usbFilePath = usbLine.slice(11);
@@ -162,7 +175,7 @@
   };
 
   checkFile = () => {
-    var fext, guessItRes, parts, usbLine;
+    var blkName, fext, guessItRes, parts, usbLine;
     tvDbErrCount = 0;
     if (usbLine = usbFiles.shift()) {
       chkCount++;
@@ -180,6 +193,16 @@
         // console.log '------', downloadCount,'/', chkCount, 'SKIPPING RECENT:', fname
         process.nextTick(checkFile);
         return;
+      }
+      for (blkName in blocked) {
+        if (fname.indexOf(blkName) > -1) {
+          recent[fname] = Date.now();
+          fs.writeFileSync('tv-recent.json', JSON.stringify(recent));
+          blockedCount++;
+          console.log('------', downloadCount, '/', chkCount, 'SKIPPING BLOCKED:', fname);
+          process.nextTick(checkFile);
+          return;
+        }
       }
       if (errors[fname]) {
         // console.log '------', downloadCount,'/', chkCount, 'SKIPPING *ERROR*:', fname
@@ -210,8 +233,14 @@
       return process.nextTick(chkTvDB);
     } else {
       console.log('.... done ....');
+      if ((deleteCount + existsCount + errCount + downloadCount + blockedCount) > 0) {
+        console.log("***********************************************************");
+      }
       if (recentCount > 0) {
         console.log('skipped recent:  ', recentCount);
+      }
+      if (blockedCount > 0) {
+        console.log('blocked:         ', blockedCount);
       }
       if (deleteCount > 0) {
         console.log('deleted:         ', deleteCount);
@@ -226,7 +255,7 @@
         console.log('downloaded:      ', downloadCount);
       }
       console.log('elapsed(mins):   ', ((Date.now() - startTime) / (60 * 1000)).toFixed(1));
-      if (deleteCount + existsCount + errCount + downloadCount > 0) {
+      if ((deleteCount + existsCount + errCount + downloadCount + blockedCount) > 0) {
         return console.log("***********************************************************");
       }
     }

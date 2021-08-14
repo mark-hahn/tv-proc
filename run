@@ -12,5 +12,3 @@ chown -R emby /mnt/media/tv
 date >> /root/dev/apps/tv-proc/tv.log
 chmod -R 774  /mnt/media/tv
 chown -R emby /mnt/media/tv
-
-

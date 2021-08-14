@@ -1,3 +1,15 @@
+<<<<<<< Updated upstream
+request.post 'https://api.thetvdb.com/login',
+  {json:true, body: {apikey: "2C92771D87CA8718"}},
+=======
+# tvDbPin = 'HXEVSDFF'
+# old apiKey = 'ad42c85592acd18e340c8f371f47b29f'
+# v4 legacy type api key = 'ad42c85592acd18e340c8f371f47b29f'
+
+request.post 'https://api4.thetvdb.com/v4/login',
+  {json:true, body: {pin: 'HXEVSDFF'}},
+>>>>>>> Stashed changes
+
 
 #todo
 #  lazy-login to thetvdb
@@ -25,7 +37,7 @@ if process.argv.length == 3
   filterRegex = process.argv[2]
   filterRegexTxt = 'filter:' + filterRegex
 
-console.log ".... starting tv.coffee v4 #{filterRegexTxt} ...."
+console.log ".... starting tv.coffee v3 #{filterRegexTxt} ...."
 startTime = time = Date.now()
 deleteCount = chkCount = recentCount = 0
 existsCount = errCount = downloadCount = blockedCount = 0;

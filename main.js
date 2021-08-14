@@ -39,7 +39,7 @@
     filterRegexTxt = 'filter:' + filterRegex;
   }
 
-  console.log(`.... starting tv.coffee v3 ${filterRegexTxt} ....`);
+  console.log(`.... starting tv.coffee v4 ${filterRegexTxt} ....`);
 
   startTime = time = Date.now();
 

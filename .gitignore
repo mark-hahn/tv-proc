@@ -1,6 +1,7 @@
-tv-recent
 .vscode
 main.js
+tv-recent.json
+
 # Logs
 logs
 *.log

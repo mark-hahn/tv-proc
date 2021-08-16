@@ -71,17 +71,20 @@ checkFileExists = checkFile = chkTvDB = null
 
 #######################################
 # get the api token
-theTvDbToken = null
-###
-# tvDbPin = 'HXEVSDFF'
-# old apiKey = '2C92771D87CA8718'
-# v4 legacy type api key = 'ad42c85592acd18e340c8f371f47b29f'
 
+# tvDbPin = 'HXEVSDFF'
+# old apiKey             = '2C92771D87CA8718'
+# v4 legacy type api key = 'ad42c85592acd18e340c8f371f47b29f'
+# new v4 api key         = 'd7fa8c90-36e3-4335-a7c0-6cbb7b0320df'
+
+theTvDbToken = null
 request.post 'https://api4.thetvdb.com/v4/login',
-  {json:true, body: {pin: 'HXEVSDFF'}},
-###
-request.post 'https://api.thetvdb.com/login',
-  {json:true, body: {apikey: "2C92771D87CA8718"}},
+      {json:true, body: {
+      "apikey": "d7fa8c90-36e3-4335-a7c0-6cbb7b0320df",
+      "pin": "HXEVSDFF"}}
+
+#request.post 'https://api.thetvdb.com/login',
+#  {json:true, body: {apikey: "2C92771D87CA8718"}},
   (error, response, body) =>
     if error or response.statusCode != 200
       console.error 'theTvDb login error:', error

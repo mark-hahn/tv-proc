@@ -35,6 +35,8 @@ findUsb = "ssh #{usbHost} find files -type f -printf '%CY-%Cm-%Cd-%P\\\\\\n' | g
 if filterRegex
   findUsb += " | grep " + filterRegex
 
+# console.log findUsb
+
 ###########
 # constants
 
@@ -79,9 +81,9 @@ checkFileExists = checkFile = chkTvDB = null
 
 theTvDbToken = null
 request.post 'https://api4.thetvdb.com/v4/login',
-      {json:true, body: {
-      "apikey": "d7fa8c90-36e3-4335-a7c0-6cbb7b0320df",
-      "pin": "HXEVSDFF"}}
+ {json:true, body: {
+    "apikey": "d7fa8c90-36e3-4335-a7c0-6cbb7b0320df",
+    "pin": "HXEVSDFF"}},
 
 #request.post 'https://api.thetvdb.com/login',
 #  {json:true, body: {apikey: "2C92771D87CA8718"}},
@@ -93,7 +95,7 @@ request.post 'https://api4.thetvdb.com/v4/login',
     else
       theTvDbToken = body.token
       # if debug
-      #   console.log 'tvdb login', {error, response, body}
+      # console.log 'tvdb login', {error, response, body}
       #   process.exit()
       process.nextTick delOldFiles
 
@@ -106,8 +108,7 @@ delOldFiles = =>
 
   for usbLine in usbFiles
     debug = false
-
-    # if usbLine.indexOf('horty') > -1
+    # if usbLine.indexOf('Island') > -1
     #   console.log 'DEBUG:', usbLine
     #   debug = true
     
@@ -158,6 +159,7 @@ checkFile = =>
       # console.log '------', downloadCount,'/', chkCount, 'SKIPPING RECENT:', fname
       process.nextTick checkFile
       return
+    # console.log('not recent', usbLine);
     for blkName of blocked
       if fname.indexOf(blkName) > -1
         recent[fname] = Date.now()
@@ -166,6 +168,7 @@ checkFile = =>
         console.log '------', downloadCount,'/', chkCount, 'SKIPPING BLOCKED:', fname
         process.nextTick checkFile
         return
+    # console.log('not blocked', usbLine);
     if errors[fname]
       # console.log '------', downloadCount,'/', chkCount, 'SKIPPING *ERROR*:', fname
       process.nextTick checkFile

@@ -3,6 +3,7 @@ if [ ${#s} -gt 1 ] ; then
   exit
 fi
 cd /root/dev/apps/tv-proc
+rsync -av hahnca.com:/mnt/backup/usb/tv-recent.json .
 echo >> /root/dev/apps/tv-proc/tv.log
 date >> /root/dev/apps/tv-proc/tv.log
 /root/.nvm/versions/node/v10.15.3/bin/node /root/dev/apps/tv-proc/main.js $1
@@ -12,3 +13,4 @@ chown -R emby /mnt/media/tv
 date >> /root/dev/apps/tv-proc/tv.log
 chmod -R 774  /mnt/media/tv
 chown -R emby /mnt/media/tv
+rsync -av tv-recent.json hahnca.com:/mnt/backup/usb

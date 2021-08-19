@@ -93,7 +93,9 @@ request.post 'https://api4.thetvdb.com/v4/login',
       console.error 'theTvDb statusCode:', response && response.statusCode
       process.exit()
     else
-      theTvDbToken = body.token
+      theTvDbToken = body.data.token
+      # console.log({theTvDbToken});
+      # process.exit();
       # if debug
       # console.log 'tvdb login', {error, response, body}
       #   process.exit()
@@ -220,6 +222,7 @@ chkTvDB = =>
     seriesName = tvdbCache[title]
     process.nextTick checkFileExists
     return
+  # console.log('search:', title);
   tvdburl = 'https://api4.thetvdb.com/v4/search?type=series&q=' + 
               encodeURIComponent(title)
   request tvdburl,

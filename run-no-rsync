@@ -1,0 +1,14 @@
+s="$(pgrep -f tv-proc/main.js)"
+if [ ${#s} -gt 1 ] ; then
+  exit
+fi
+cd /root/dev/apps/tv-proc
+echo >> /root/dev/apps/tv-proc/tv.log
+date >> /root/dev/apps/tv-proc/tv.log
+/root/.nvm/versions/node/v10.15.3/bin/node /root/dev/apps/tv-proc/main.js $1
+chmod -R 774  /mnt/media/tv
+chown -R emby /mnt/media/tv
+/root/.nvm/versions/node/v10.15.3/bin/node /root/dev/apps/tv-proc/prune-dupes.js
+date >> /root/dev/apps/tv-proc/tv.log
+chmod -R 774  /mnt/media/tv
+chown -R emby /mnt/media/tv

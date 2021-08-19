@@ -220,7 +220,8 @@ chkTvDB = =>
     seriesName = tvdbCache[title]
     process.nextTick checkFileExists
     return
-  tvdburl = 'https://api.thetvdb.com/search/series?name=' + encodeURIComponent(title)
+  tvdburl = 'https://api4.thetvdb.com/v4/search?type=series&q=' + 
+              encodeURIComponent(title)
   request tvdburl,
     {json:true, headers: {Authorization: 'Bearer ' + theTvDbToken}},
     (error, response, body) =>

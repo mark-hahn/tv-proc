@@ -243,7 +243,7 @@ chkTvDB = =>
         else
           process.nextTick badFile
       else
-        seriesName = body.data[0].seriesName
+        seriesName = body.data[0].name
         if map[seriesName]
           console.log '+++ Mapping', seriesName, 'to', map[seriesName]
           seriesName = map[seriesName]

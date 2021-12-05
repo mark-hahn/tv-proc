@@ -2,5 +2,6 @@
   "perry.mason":true,
   "Perry.Mason":true,
   ".FLEMISH."  :true,
-  ".flemish."  :true
+  ".flemish."  :true,
+  "sample"     :true
 }

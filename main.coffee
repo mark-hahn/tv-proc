@@ -216,6 +216,7 @@ checkFile = =>
       console.log "***********************************************************"
 
 tvdbCache = {}
+tvdburl = ''
 
 chkTvDB = =>
   if tvdbCache[title]
@@ -223,14 +224,17 @@ chkTvDB = =>
     process.nextTick checkFileExists
     return
   # console.log('search:', title);
-  tvdburl = 'https://api4.thetvdb.com/v4/search?type=series&q=' + 
+  if title.includes "Schmo"
+    tvdburl = 'https://api4.thetvdb.com/v4/search?type=series&q=Joe%20Schmo'
+    console.log "tvdb lookup for joe schmo", 
+  else tvdburl = 'https://api4.thetvdb.com/v4/search?type=series&q=' + 
               encodeURIComponent(title)
   request tvdburl,
     {json:true, headers: {Authorization: 'Bearer ' + theTvDbToken}},
     (error, response, body) =>
       # console.log 'thetvdb', {tvdburl, error, response, body}
-      if error or (response?.statusCode != 200)
-        console.error 'no series name found in theTvDB:', fname
+      if error or not body.data[0] or (response?.statusCode != 200)
+        console.error 'no series name found in theTvDB:', {fname, tvdburl}
         console.error 'search error:', error
         console.error 'search statusCode:', response && response.statusCode
         console.error 'search body:', body

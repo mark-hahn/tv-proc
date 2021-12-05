@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/mark-hahn/tv-proc#readme",
   "dependencies": {
+    "coffeescript": "^2.6.1",
     "fs-plus": "^3.0.1",
     "mkdirp": "^0.5.1",
     "request": "^2.83.0",

@@ -56,7 +56,7 @@ tvPath    = '/mnt/media/tv/'
 escQuotesS = (str) ->
   '"' + str.replace(/\\/g, '\\\\')
            .replace(/"/g,  '\\"')
-           .replace(/'/g,  "\\'")
+           .replace(/'|`/g,  "\\'")
            .replace(/\(/g, "\\(")
            .replace(/\)/g, "\\)")
            .replace(/\&/g, "\\&")
@@ -177,7 +177,7 @@ checkFile = =>
       return
     console.log '>>>>>>', downloadCount,'/', chkCount, errCount, fname
 
-    guessItRes = exec("/usr/local/bin/guessit -js '#{fname.replace /'/g, ''}'",
+    guessItRes = exec("/usr/local/bin/guessit -js '#{fname.replace /'|`/g, ''}'",
                       {timeout:300000}).toString()
     # console.log {guessItRes}
     try
@@ -224,10 +224,7 @@ chkTvDB = =>
     process.nextTick checkFileExists
     return
   # console.log('search:', title);
-  if title.includes "Schmo"
-    tvdburl = 'https://api4.thetvdb.com/v4/search?type=series&q=Joe%20Schmo'
-    console.log "tvdb lookup for joe schmo", 
-  else tvdburl = 'https://api4.thetvdb.com/v4/search?type=series&q=' + 
+  tvdburl = 'https://api4.thetvdb.com/v4/search?type=series&q=' + 
               encodeURIComponent(title)
   request tvdburl,
     {json:true, headers: {Authorization: 'Bearer ' + theTvDbToken}},

@@ -230,7 +230,7 @@ chkTvDB = =>
     {json:true, headers: {Authorization: 'Bearer ' + theTvDbToken}},
     (error, response, body) =>
       # console.log 'thetvdb', {tvdburl, error, response, body}
-      if error or not body.data[0] or (response?.statusCode != 200)
+      if error or not body.data?[0] or (response?.statusCode != 200)
         console.error 'no series name found in theTvDB:', {fname, tvdburl}
         console.error 'search error:', error
         console.error 'search statusCode:', response && response.statusCode
@@ -258,13 +258,14 @@ checkFileExists = =>
   usbLongPath  = "#{usbHost}:#{videoPath}"
   if fs.existsSync tvFilePath
     existsCount++
-    console.log "... skipping existing file ..."
+    console.log "... skipping existing file : " + tvFilePath
   else
     mkdirp.sync tvSeasonPath
-    if usbFilePath.indexOf('/') > -1
-      console.log "... downloading file (dir: #{usbFilePath}) ..."
-    else
-      console.log "... downloading file ..."
+    console.log "... downloading file (usb path: #{usbFilePath}\nlocalPath: #{tvFilePath}) ..."
+    # if usbFilePath.indexOf('/') > -1
+    #   console.log "... downloading file (dir: #{usbFilePath}) ..."
+    # else
+      # console.log "... downloading file ..."
     # console.log escQuotes tvSeasonPath
     # console.log escQuotes tvFilePath
     # console.log escQuotes videoPath

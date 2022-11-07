@@ -1,10 +1,16 @@
 {
-  "perry.mason":true,
-  "Perry.Mason":true,
-  ".FLEMISH."  :true,
-  ".flemish."  :true,
-  "sample"     :true,
-  "Physical - S01E01":true,
-  "Legends.Of.Tomorrow": true,
-  "Last.Man.Standing":true
+  "perry.mason"              :true,
+  "Perry.Mason"              :true,
+  ".FLEMISH."                :true,
+  ".flemish."                :true,
+  "sample"                   :true,
+  "Deleted Scenes"           :true,
+  "Commentary"               :true,
+  "Featurettes"              :true,
+  "Features"                 :true,
+  "Physical - S01E01"        :true,
+  "Legends.Of.Tomorrow"      :true,
+  "Last.Man.Standing"        :true,
+  "Uncle.From.Another.World" :true,
+  "NORDiC"                   :true
 }

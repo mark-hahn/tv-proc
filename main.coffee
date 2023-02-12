@@ -37,6 +37,20 @@ if filterRegex
 
 # console.log findUsb
 
+recent = {}
+
+readRecent = () =>
+  recent = JSON.parse fs.readFileSync 'tv-recent.json', 'utf8'
+  for recentFname, recentTime of recent
+    recent[recentFname] = new Date(recentTime).getTime()
+
+writeRecent = () =>
+  for recentFname, recentTime of recent
+    recent[recentFname] = new Date(recentTime)
+  fs.writeFileSync 'tv-recent.json', JSON.stringify recent
+
+readRecent()
+
 ###########
 # constants
 
@@ -48,7 +62,6 @@ for line in mapLines
   if line.length then map[f.trim()] = t.trim()
 
 blocked = JSON.parse fs.readFileSync 'tv-blocked.json', 'utf8'
-recent  = JSON.parse fs.readFileSync 'tv-recent.json', 'utf8'
 errors  = JSON.parse fs.readFileSync 'tv-errors', 'utf8'
 
 tvPath    = '/mnt/media/tv/'
@@ -127,7 +140,8 @@ delOldFiles = =>
     delete recent[recentFname]
     recentChgd = yes
   if recentChgd
-    fs.writeFileSync 'tv-recent.json', JSON.stringify recent
+    writeRecent()
+    # fs.writeFileSync 'tv-recent.json', JSON.stringify recent
 
   process.nextTick checkFiles
 
@@ -165,7 +179,8 @@ checkFile = =>
     for blkName of blocked
       if fname.indexOf(blkName) > -1
         recent[fname] = Date.now()
-        fs.writeFileSync 'tv-recent.json', JSON.stringify recent
+        writeRecent()
+        # fs.writeFileSync 'tv-recent.json', JSON.stringify recent
         blockedCount++
         console.log '------', downloadCount,'/', chkCount, 'SKIPPING BLOCKED:', fname
         process.nextTick checkFile
@@ -279,7 +294,8 @@ checkFileExists = =>
     time = Date.now()
 
   recent[fname] = Date.now()
-  fs.writeFileSync 'tv-recent.json', JSON.stringify recent
+  writeRecent()
+  # fs.writeFileSync 'tv-recent.json', JSON.stringify recent
   process.nextTick checkFile
 
 badFile = =>

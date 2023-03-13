@@ -1,3 +1,5 @@
+#! /bin/bash
+
 s="$(pgrep -f tv-proc/main.js)"
 if [ ${#s} -gt 1 ] ; then
   exit

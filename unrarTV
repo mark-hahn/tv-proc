@@ -1,0 +1,3 @@
+unset PATH
+/usr/bin/find /mnt/media/tv -name '*.rar' -exec ~/dev/apps/tv-proc/rar e -o- {} >> ~/dev/apps/tv-proc/tv.log \;
+

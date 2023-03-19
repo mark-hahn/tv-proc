@@ -131,7 +131,7 @@ delOldFiles = =>
     if usbDate < usbAgeLimit
       usbFilePath = usbLine.slice 11
       deleteCount++
-      console.log 'removing old file:', usbFilePath
+      console.log 'removing old file from usb:', usbFilePath
       res = exec("ssh #{usbHost} rm -rf #{escQuotesS "files/" + usbFilePath}",
                        {timeout:300000}).toString()
 

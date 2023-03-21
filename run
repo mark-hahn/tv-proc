@@ -2,6 +2,7 @@
 
 s="$(pgrep -f tv-proc/main.js)"
 if [ ${#s} -gt 1 ] ; then
+  echo "stopping, tv-proc already running"
   exit
 fi
 cd /root/dev/apps/tv-proc

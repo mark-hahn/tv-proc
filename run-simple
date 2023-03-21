@@ -1,0 +1,20 @@
+#! /bin/bash
+cd /root/dev/apps/tv-proc
+# returns code eq to s which if not 0 will fail so -e is after this
+s="$(pgrep -f tv-proc/main.js)"
+set -e
+if [ ${#s} -gt 1 ] ; then
+  echo "stopping, tv-proc already running"
+  exit
+fi
+killall tail
+tail -fn 100 tv.log &
+echo >> tv.log
+date >> tv.log
+/root/.nvm/versions/node/v16.15.1/bin/node /root/dev/apps/tv-proc/main.js $1 >> tv.log 
+chmod -R 774  /mnt/media/tv
+chown -R emby /mnt/media/tv
+/root/.nvm/versions/node/v16.15.1/bin/node /root/dev/apps/tv-proc/prune-dupes.js >> tv.log
+date >> tv.log
+chmod -R 774  /mnt/media/tv
+chown -R emby /mnt/media/tv

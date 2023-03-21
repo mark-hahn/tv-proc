@@ -290,8 +290,11 @@ checkFileExists = =>
       console.log(exec("rsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}",
                         fileTimeout).toString().replace('\n\n', '\n'),
                       ((Date.now() - time)/1000).toFixed(0) + ' secs')
-    catch (e)
-      console.log "\nrsync download error: #{e.message}\n"
+    catch e
+      console.log "\nvvvvvvvv\nrsync download error: #{e.message}^^^^^^^^^\n"
+      badFile();
+      return;
+      
     downloadCount++
     time = Date.now()
 

@@ -286,10 +286,12 @@ checkFileExists = =>
     # console.log escQuotes videoPath
     # console.log escQuotes usbLongPath
     # console.log "\nrsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}\n"
-
-    console.log(exec("rsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}",
-                      fileTimeout).toString().replace('\n\n', '\n'),
-                    ((Date.now() - time)/1000).toFixed(0) + ' secs')
+    try
+      console.log(exec("rsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}",
+                        fileTimeout).toString().replace('\n\n', '\n'),
+                      ((Date.now() - time)/1000).toFixed(0) + ' secs')
+    catch (e)
+      console.log "\nrsync download error: #{e.message}\n"
     downloadCount++
     time = Date.now()
 

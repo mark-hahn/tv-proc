@@ -68,12 +68,13 @@ tvPath    = '/mnt/media/tv/'
 
 escQuotesS = (str) ->
   '"' + str.replace(/\\/g, '\\\\')
-           .replace(/"/g,  '\\"')
-           .replace(/'|`/g,  "\\'")
-           .replace(/\(/g, "\\(")
-           .replace(/\)/g, "\\)")
-           .replace(/\&/g, "\\&")
-           .replace(/\s/g, '\\ ')  + '"'
+           .replace(/"/g,  '\\"') + '"'
+          #  .replace(/'|`/g,  "\\'")
+          #  .replace(/\(/g, "\\(")
+          #  .replace(/\)/g, "\\)")
+          #  .replace(/\&/g, "\\&")
+          #  .replace(/\s/g, '\\ ')  
+  
 
 escQuotes = (str) ->
   '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"'
@@ -190,7 +191,7 @@ checkFile = =>
       # console.log '------', downloadCount,'/', chkCount, 'SKIPPING *ERROR*:', fname
       process.nextTick checkFile
       return
-    console.log '>>>>>>', downloadCount,'/', chkCount, errCount, fname
+    console.log '\n>>>>>>', downloadCount,'/', chkCount, errCount, fname
 
     guessItRes = exec("/usr/local/bin/guessit -js '#{fname.replace /'|`/g, ''}'",
                       {timeout:300000}).toString()
@@ -275,17 +276,20 @@ checkFileExists = =>
     existsCount++
     console.log "... skipping existing file : " + tvFilePath
   else
-    mkdirp.sync tvSeasonPath
-    console.log "... downloading file (usb path: #{usbFilePath}\nlocalPath: #{tvFilePath}) ..."
-    # if usbFilePath.indexOf('/') > -1
-    #   console.log "... downloading file (dir: #{usbFilePath}) ..."
-    # else
-      # console.log "... downloading file ..."
     # console.log escQuotes tvSeasonPath
     # console.log escQuotes tvFilePath
     # console.log escQuotes videoPath
     # console.log escQuotes usbLongPath
+
+    mkdirp.sync tvSeasonPath
+
+    console.log "usb path: #{usbFilePath}\nlocalPath: #{tvFilePath}"
+    # if usbFilePath.indexOf('/') > -1
+    #   console.log "downloading file (dir: #{usbFilePath}"
+    # else
+      # console.log "... downloading file ..."
     # console.log "\nrsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}\n"
+
     try
       console.log(exec("rsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}",
                         fileTimeout).toString().replace('\n\n', '\n'),
@@ -305,6 +309,6 @@ checkFileExists = =>
 
 badFile = =>
   errCount++
-  errors[fname] = true
+  errors[fname] = Date.now()
   fs.writeFileSync 'tv-errors', JSON.stringify errors
   process.nextTick checkFile

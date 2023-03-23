@@ -9,7 +9,7 @@
 usbHost =  "xobtlu@oracle.usbx.me"
 
 usbAgeLimit = Date.now() - 2*7*24*60*60*1000 # 2 weeks ago
-recentLimit = Date.now() - 3*7*24*60*60*1000 # 3 weeks ago
+recentLimit = new Date(Date.now() - 3*7*24*60*60*1000) # 3 weeks ago
 fileTimeout = {timeout: 2*60*60*1000} # 2 hours
 
 fs   = require 'fs-plus'
@@ -137,7 +137,7 @@ delOldFiles = =>
                        {timeout:300000}).toString()
 
   recentChgd = no
-  for recentFname, recentTime of recent when recentTime < recentLimit
+  for recentFname, recentTime of recent when new Date(recentTime) < recentLimit
     delete recent[recentFname]
     recentChgd = yes
   if recentChgd

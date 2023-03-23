@@ -120,7 +120,13 @@ request.post 'https://api4.thetvdb.com/v4/login',
 
 delOldFiles = =>
   # console.log ".... checking for files to delete ...."
-  usbFiles = exec(findUsb, {timeout:300000}).toString().split '\n'
+  try
+    usbFiles = exec(findUsb, {timeout:300000}).toString().split '\n'
+  catch e
+    console.log "\nvvvvvvvv\nrsync find files to delete error: \n" +
+                "#{e.message}^^^^^^^^^\n"
+    process.nextTick checkFiles
+    return;
 
   for usbLine in usbFiles
     debug = false
@@ -295,7 +301,7 @@ checkFileExists = =>
                         fileTimeout).toString().replace('\n\n', '\n'),
                       ((Date.now() - time)/1000).toFixed(0) + ' secs')
     catch e
-      console.log "\nvvvvvvvv\nrsync download error: #{e.message}^^^^^^^^^\n"
+      console.log "\nvvvvvvvv\nrsync download error: \n#{e.message}^^^^^^^^^\n"
       badFile();
       return;
       

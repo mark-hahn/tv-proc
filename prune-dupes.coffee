@@ -1,8 +1,8 @@
 
-fs = require 'fs-plus'
+fs   = require 'fs-plus'
 exec = require('child_process').execSync
 
-console.log ".... pruning episodes ...."
+# console.log ".... pruning local duplicate episode files ...."
 
 epis = {}
 nfoFiles = exec "find /mnt/media/tv -name '*.nfo'"
@@ -26,7 +26,7 @@ for file in nfoFiles.toString().split '\n' when file and file.indexOf('/season.n
     parts = file.split '.'
     parts.splice -1, 1
     base = parts.join '.'
-    console.log 'deleting', key
+    console.log 'deleting local duplicate file:\n    ', key
     exec 'rm "' + base + '"*'
 
   epis[key] = yes

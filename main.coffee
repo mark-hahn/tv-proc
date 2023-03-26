@@ -25,7 +25,7 @@ if process.argv.length == 3
   filterRegex = process.argv[2]
   filterRegexTxt = 'filter:' + filterRegex
 
-console.log ".... starting tv.coffee v4 #{filterRegexTxt} ...."
+# console.log ".... starting tv.coffee v4 #{filterRegexTxt} ...."
 startTime = time = Date.now()
 deleteCount = chkCount = recentCount = 0
 existsCount = errCount = downloadCount = blockedCount = 0;
@@ -217,7 +217,7 @@ checkFile = =>
       return
     process.nextTick chkTvDB
   else
-    console.log '.... done ....'
+    # console.log '.... done ....'
     if (deleteCount + existsCount + errCount + downloadCount + blockedCount) > 0
       console.log "***********************************************************"
     if (recentCount > 0)

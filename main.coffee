@@ -75,6 +75,14 @@ escQuotesS = (str) ->
           #  .replace(/\&/g, "\\&")
           #  .replace(/\s/g, '\\ ')  
   
+escQuotesS2 = (str) ->
+  '"' + str.replace(/\\/g, '\\\\')
+            .replace(/'|`/g, "\\'")
+            .replace(/"/g,  '\\"')
+            .replace(/\(/g, "\\(")
+            .replace(/\)/g, "\\)") + '"'
+
+
 
 escQuotes = (str) ->
   '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"'
@@ -124,7 +132,7 @@ delOldFiles = =>
     usbFiles = exec(findUsb, {timeout:300000}).toString().split '\n'
   catch e
     console.log "\nvvvvvvvv\nrsync find files to delete error: \n" +
-                "#{e.message}^^^^^^^^^\n"
+                "#{e.message}^^^^^^^^^"
     process.nextTick checkFiles
     return;
 
@@ -134,13 +142,19 @@ delOldFiles = =>
     #   console.log 'DEBUG:', usbLine
     #   debug = true
     
-    usbDate = new Date(usbLine.slice 0,10).getTime()
-    if usbDate < usbAgeLimit
-      usbFilePath = usbLine.slice 11
-      deleteCount++
-      console.log 'removing old file from usb:', usbFilePath
-      res = exec("ssh #{usbHost} rm -rf #{escQuotesS "files/" + usbFilePath}",
-                       {timeout:300000}).toString()
+    try
+      usbDate = new Date(usbLine.slice 0,10).getTime()
+      if usbDate < usbAgeLimit
+        usbFilePath = usbLine.slice 11
+        deleteCount++
+        console.log 'removing old file from usb:', usbFilePath
+        res = exec("ssh #{usbHost} rm -rf #{escQuotesS2 "files/" + usbFilePath}",
+                        {timeout:300000}).toString()
+    catch e
+      console.log "\nvvvvvvvv\nrsync remove old file from usb error: \n" +
+            "#{usbFilePath}\n#{e.message}^^^^^^^^^"
+
+# ssh xobtlu@oracle.usbx.me rm -rf "Bob\'s.Burgers.S10E19.The.Handyman.Can.(1080p.HULU.Webrip.x265.10bit.EAC3.5.1.-.Goki)[TAoE]/Season 13/Bob\'s Burgers - S13E15 - The Show \(And Tell\) Must Go On WEBDL-1080p.mkv"
 
   recentChgd = no
   for recentFname, recentTime of recent when new Date(recentTime) < recentLimit
@@ -301,7 +315,7 @@ checkFileExists = =>
                         fileTimeout).toString().replace('\n\n', '\n'),
                       ((Date.now() - time)/1000).toFixed(0) + ' secs')
     catch e
-      console.log "\nvvvvvvvv\nrsync download error: \n#{e.message}^^^^^^^^^\n"
+      console.log "\nvvvvvvvv\nrsync download error: \n#{e.message}^^^^^^^^^"
       badFile();
       return;
       

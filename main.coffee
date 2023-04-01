@@ -211,7 +211,7 @@ checkFile = =>
         writeMap 'tv-recent.json', recent
         # fs.writeFileSync 'tv-recent.json', JSON.stringify recent
         blockedCount++
-        console.log '------', downloadCount,'/', chkCount, 'SKIPPING BLOCKED:', fname
+        console.log '-- BLOCKED:', fname
         process.nextTick checkFile
         return
     # console.log('not blocked', usbLine);
@@ -302,7 +302,7 @@ checkFileExists = =>
   usbLongPath  = "#{usbHost}:#{videoPath}"
   if fs.existsSync tvFilePath
     existsCount++
-    console.log "... skipping existing file : " + tvFilePath
+    console.log "-- EXISTING: " + fname
   else
     # console.log escQuotes tvSeasonPath
     # console.log escQuotes tvFilePath
@@ -330,7 +330,7 @@ checkFileExists = =>
     downloadCount++
     time = Date.now()
 
-  recent[fname] = dateStr Date.now()
+  recent[fname] = Date.now()
   writeMap 'tv-recent.json', recent
   # fs.writeFileSync 'tv-recent.json', JSON.stringify recent
   process.nextTick checkFile

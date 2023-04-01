@@ -1,0 +1,2 @@
+change error.json to readable dates
+file delete errors (spaces?)

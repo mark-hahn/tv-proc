@@ -37,19 +37,30 @@ if filterRegex
 
 # console.log findUsb
 
-recent = {}
+dateStr = (date) =>
+  date    = new Date date
+  year    = date.getFullYear();
+  month   = (date.getMonth() + 1).toString().padStart(2, '0');
+  day     = date.getDate().toString().padStart(2, '0');
+  hours   = date.getHours().toString().padStart(2, '0');
+  minutes = date.getMinutes().toString().padStart(2, '0');
+  seconds = date.getSeconds().toString().padStart(2, '0');
+  "#{year}/#{month}/#{day}-#{hours}:#{minutes}:#{seconds}"
 
-readRecent = () =>
-  recent = JSON.parse fs.readFileSync 'tv-recent.json', 'utf8'
-  for recentFname, recentTime of recent
-    recent[recentFname] = new Date(recentTime).getTime()
+readMap = (fname) =>
+  map = JSON.parse fs.readFileSync fname, 'utf8'
+  for entry, time of map
+    map[entry] = new Date(time).getTime()
+  map
 
-writeRecent = () =>
-  for recentFname, recentTime of recent
-    recent[recentFname] = new Date(recentTime)
-  fs.writeFileSync 'tv-recent.json', JSON.stringify recent
+writeMap = (fname, map) =>
+  for entry, time of map
+    map[entry] = dateStr time
+  fs.writeFileSync fname, JSON.stringify map
 
-readRecent()
+recent  = readMap 'tv-recent.json'
+errors  = readMap 'tv-errors'
+blocked = JSON.parse fs.readFileSync 'tv-blocked.json', 'utf8'
 
 ###########
 # constants
@@ -60,9 +71,6 @@ mapLines = mapStr.split '\n'
 for line in mapLines
   [f,t] = line.split ','
   if line.length then map[f.trim()] = t.trim()
-
-blocked = JSON.parse fs.readFileSync 'tv-blocked.json', 'utf8'
-errors  = JSON.parse fs.readFileSync 'tv-errors', 'utf8'
 
 tvPath    = '/mnt/media/tv/'
 
@@ -161,7 +169,7 @@ delOldFiles = =>
     delete recent[recentFname]
     recentChgd = yes
   if recentChgd
-    writeRecent()
+    writeMap 'tv-recent.json', recent
     # fs.writeFileSync 'tv-recent.json', JSON.stringify recent
 
   process.nextTick checkFiles
@@ -200,7 +208,7 @@ checkFile = =>
     for blkName of blocked
       if fname.indexOf(blkName) > -1
         recent[fname] = Date.now()
-        writeRecent()
+        writeMap 'tv-recent.json', recent
         # fs.writeFileSync 'tv-recent.json', JSON.stringify recent
         blockedCount++
         console.log '------', downloadCount,'/', chkCount, 'SKIPPING BLOCKED:', fname
@@ -322,13 +330,14 @@ checkFileExists = =>
     downloadCount++
     time = Date.now()
 
-  recent[fname] = Date.now()
-  writeRecent()
+  recent[fname] = dateStr Date.now()
+  writeMap 'tv-recent.json', recent
   # fs.writeFileSync 'tv-recent.json', JSON.stringify recent
   process.nextTick checkFile
 
 badFile = =>
   errCount++
   errors[fname] = Date.now()
-  fs.writeFileSync 'tv-errors', JSON.stringify errors
+  writeMap 'tv-errors', errors
+  # fs.writeFileSync 'tv-errors', JSON.stringify errors
   process.nextTick checkFile

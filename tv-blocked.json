@@ -1,9 +1,10 @@
 {
+  "sample"                   :true,
+  ".sfv"                     :true,
   "perry.mason"              :true,
   "Perry.Mason"              :true,
   ".FLEMISH."                :true,
   ".flemish."                :true,
-  "sample"                   :true,
   "Deleted Scenes"           :true,
   "Commentary"               :true,
   "Featurettes"              :true,

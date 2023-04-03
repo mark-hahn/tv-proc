@@ -1,2 +1,2 @@
-change error.json to readable dates
 file delete errors (spaces?)
+episode watched toggle not working

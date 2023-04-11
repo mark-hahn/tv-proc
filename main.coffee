@@ -74,7 +74,7 @@ for line in mapLines
 
 tvPath    = '/mnt/media/tv/'
 
-escQuotesS = (str) ->
+escQuotes = (str) ->
   '"' + str.replace(/\\/g, '\\\\')
            .replace(/"/g,  '\\"') + '"'
           #  .replace(/'|`/g,  "\\'")
@@ -83,19 +83,6 @@ escQuotesS = (str) ->
           #  .replace(/\&/g, "\\&")
           #  .replace(/\s/g, '\\ ')  
   
-escQuotesS2 = (str) ->
-  '"' + str.replace(/\\/g, '\\\\')
-            .replace(/'|`/g, "\\'")
-            .replace(/"/g,  '\\"')
-            .replace(/\(/g, "\\(")
-            .replace(/\)/g, "\\)") + '"'
-
-
-
-escQuotes = (str) ->
-  '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"'
-  # '"' + str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'") + '"'
-
 ################
 # async routines
 getUsbFiles = delOldFiles = checkFiles = checkFile = badFile =
@@ -129,6 +116,7 @@ request.post 'https://api4.thetvdb.com/v4/login',
       # if debug
       # console.log 'tvdb login', {error, response, body}
       #   process.exit()
+
       process.nextTick delOldFiles
 
 ######################################################
@@ -136,31 +124,34 @@ request.post 'https://api4.thetvdb.com/v4/login',
 
 delOldFiles = =>
   # console.log ".... checking for files to delete ...."
-  try
-    usbFiles = exec(findUsb, {timeout:300000}).toString().split '\n'
-  catch e
-    console.log "\nvvvvvvvv\nrsync find files to delete error: \n" +
-                "#{e.message}^^^^^^^^^"
-    process.nextTick checkFiles
-    return;
+  # try
+  #   usbFiles = exec(findUsb, {timeout:300000}).toString().split '\n'
+  # catch e
+  #   console.log "\nvvvvvvvv\nrsync find files to delete error: \n" +
+  #               "#{e.message}^^^^^^^^^"
+  #   process.nextTick checkFiles
+  #   return;
 
-  for usbLine in usbFiles
-    debug = false
-    # if usbLine.indexOf('Island') > -1
-    #   console.log 'DEBUG:', usbLine
-    #   debug = true
+  # for usbLine in usbFiles
+  #   debug = false
+  #   # if usbLine.indexOf('Island') > -1
+  #   #   console.log 'DEBUG:', usbLine
+  #   #   debug = true
     
-    try
-      usbDate = new Date(usbLine.slice 0,10).getTime()
-      if usbDate < usbAgeLimit
-        usbFilePath = usbLine.slice 11
-        deleteCount++
-        console.log 'removing old file from usb:', usbFilePath
-        res = exec("ssh #{usbHost} rm -rf #{escQuotesS2 "files/" + usbFilePath}",
-                        {timeout:300000}).toString()
-    catch e
-      console.log "\nvvvvvvvv\nrsync remove old file from usb error: \n" +
-            "#{usbFilePath}\n#{e.message}^^^^^^^^^"
+  #   try
+  #     usbDate = new Date(usbLine.slice 0,10).getTime()
+  #     if usbDate < usbAgeLimit
+  #       usbFilePath = usbLine.slice 11
+  #       deleteCount++
+  #       console.log 'removing old file from usb:', usbFilePath
+  #       res = exec("ssh #{usbHost} rm #{escQuotes "files/" + usbFilePath}",
+  #                       {timeout:300000}).toString()
+  #       if res == ''
+  #         console.log "\nvvvvvvvv\nrsync remove old file from usb error: \n" +
+  #               "rm #{escQuotes "files/" + usbFilePath}\n#{usbFilePath}\n#{e.message}^^^^^^^^^"
+  #   catch e
+  #     console.log "\nvvvvvvvv\nrsync remove old file from usb error: \n" +
+  #           "#{usbFilePath}\n#{e.message}^^^^^^^^^"
 
 # ssh xobtlu@oracle.usbx.me rm -rf "Bob\'s.Burgers.S10E19.The.Handyman.Can.(1080p.HULU.Webrip.x265.10bit.EAC3.5.1.-.Goki)[TAoE]/Season 13/Bob\'s Burgers - S13E15 - The Show \(And Tell\) Must Go On WEBDL-1080p.mkv"
 
@@ -316,10 +307,10 @@ checkFileExists = =>
     #   console.log "downloading file (dir: #{usbFilePath}"
     # else
       # console.log "... downloading file ..."
-    # console.log "\nrsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}\n"
+    # console.log "\nrsync -av #{escQuotes usbLongPath} #{escQuotes tvFilePath}\n"
 
     try
-      console.log(exec("rsync -av #{escQuotesS usbLongPath} #{escQuotes tvFilePath}",
+      console.log(exec("rsync -av #{escQuotes usbLongPath} #{escQuotes tvFilePath}",
                         fileTimeout).toString().replace('\n\n', '\n'),
                       ((Date.now() - time)/1000).toFixed(0) + ' secs')
     catch e

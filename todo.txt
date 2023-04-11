@@ -1,2 +1,2 @@
-file delete errors (spaces?)
 episode watched toggle not working
+first download has NaN secs

@@ -6,6 +6,8 @@
 
 # debug = true
 
+rsyncDelay = 3000  # 3 secs
+
 usbHost =  "xobtlu@oracle.usbx.me"
 
 usbAgeLimit = Date.now() - 2*7*24*60*60*1000 # 2 weeks ago
@@ -256,7 +258,8 @@ tvdburl = ''
 chkTvDB = =>
   if tvdbCache[title]
     seriesName = tvdbCache[title]
-    process.nextTick checkFileExists
+    # process.nextTick checkFileExists
+    setTimeout checkFileExists rsyncDelay
     return
   # console.log('search:', title);
   tvdburl = 'https://api4.thetvdb.com/v4/search?type=series&q=' + 
@@ -284,7 +287,8 @@ chkTvDB = =>
           console.log '+++ Mapping', seriesName, 'to', map[seriesName]
           seriesName = map[seriesName]
         tvdbCache[title] = seriesName
-        process.nextTick checkFileExists
+        # process.nextTick checkFileExists
+        setTimeout checkFileExists, rsyncDelay
 
 checkFileExists = =>
   tvSeasonPath = "#{tvPath}#{seriesName}/Season #{season}"

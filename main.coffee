@@ -259,7 +259,7 @@ chkTvDB = =>
   if tvdbCache[title]
     seriesName = tvdbCache[title]
     # process.nextTick checkFileExists
-    setTimeout checkFileExists rsyncDelay
+    setTimeout checkFileExists, rsyncDelay
     return
   # console.log('search:', title);
   tvdburl = 'https://api4.thetvdb.com/v4/search?type=series&q=' + 
@@ -278,7 +278,7 @@ chkTvDB = =>
             console.error 'giving up, downloaded:', downloadCount
             return
           console.error "tvdb err retry, waiting one minute"
-          setTimeout chkTvDB, 300000
+          setTimeout chkTvDB, rsyncDelay
         else
           process.nextTick badFile
       else

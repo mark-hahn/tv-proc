@@ -8,4 +8,4 @@ cd /root/dev/apps/tv-proc
 echo >> /root/dev/apps/tv-proc/tv.log
 echo "====== Getting files with regex \"$1\" ======"
 date >> /root/dev/apps/tv-proc/tv.log
-/root/.nvm/versions/node/v14.18.0/bin/node /root/dev/apps/tv-proc/main.js $1
+/root/.nvm/versions/node/v16.15.1/bin/node /root/dev/apps/tv-proc/main.js $1

@@ -32,7 +32,7 @@ startTime = time = Date.now()
 deleteCount = chkCount = recentCount = 0
 existsCount = errCount = downloadCount = blockedCount = 0;
 
-findUsb = "ssh #{usbHost} find files -type f ! -path \"*incomplete*\" -printf '%CY-%Cm-%Cd-%P\\\\\\n' | grep -v .r[0-9][0-9]$ | grep -v .rar$"
+findUsb = "ssh #{usbHost} find files -type f -printf '%CY-%Cm-%Cd-%P\\\\\\n' | grep -v .r[0-9][0-9]$ | grep -v .rar$"
 
 if filterRegex
   findUsb += " | grep -i " + filterRegex

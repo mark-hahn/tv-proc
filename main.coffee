@@ -1,3 +1,11 @@
+###
+convert to js:
+  https://decaffeinate-project.org/repl/
+  use these options:
+    --prefer-const
+    --loose-default-params
+    --disable-babel-constructor-workaround
+###
 
 #todo
 #  lazy-login to thetvdb

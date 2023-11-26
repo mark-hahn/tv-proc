@@ -59,13 +59,13 @@ dateStr = (date) =>
 
 readMap = (fname) =>
   map = JSON.parse fs.readFileSync fname, 'utf8'
-  for entry, time of map
-    map[entry] = new Date(time).getTime()
+  for entry, timex of map
+    map[entry] = new Date(timex).getTime()
   map
 
 writeMap = (fname, map) =>
-  for entry, time of map
-    map[entry] = dateStr time
+  for entry, timex of map
+    map[entry] = dateStr timex
   fs.writeFileSync fname, JSON.stringify map
 
 recent  = readMap 'tv-recent.json'

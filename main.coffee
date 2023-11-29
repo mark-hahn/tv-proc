@@ -264,11 +264,17 @@ tvdbCache = {}
 tvdburl = ''
 
 chkTvDB = =>
+  if title.includes('Faraway')
+    seriesName = 'Faraway Downs'
+    setTimeout checkFileExists, rsyncDelay
+    return
+
   if tvdbCache[title]
     seriesName = tvdbCache[title]
     # process.nextTick checkFileExists
     setTimeout checkFileExists, rsyncDelay
     return
+    
   # console.log('search:', title);
   tvdburl = 'https://api4.thetvdb.com/v4/search?type=series&q=' + 
               encodeURIComponent(title)

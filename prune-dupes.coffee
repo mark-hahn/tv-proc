@@ -11,7 +11,7 @@ for file in nfoFiles.toString().split '\n' when file and file.indexOf('/season.n
   # if file.indexOf('Worst') == -1 then continue
 
   parts = file.split '/'
-  parts.splice -1, 1
+  parts.pop()
   seasonPath = parts.join '/'
 
   nfo = fs.readFileSync file, 'utf8'
@@ -24,9 +24,10 @@ for file in nfoFiles.toString().split '\n' when file and file.indexOf('/season.n
 
   if epis[key]
     parts = file.split '.'
-    parts.splice -1, 1
+    parts.pop()
     base = parts.join '.'
-    console.log 'deleting local duplicate file:\n    ', key
-    exec 'rm "' + base + '"*'
+    cmd = 'rm "' + base + '"*'
+    console.log 'deleting local duplicate file:\n    ', key, '\n    ', cmd
+    exec cmd
 
   epis[key] = yes

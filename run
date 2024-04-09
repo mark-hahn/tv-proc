@@ -17,7 +17,7 @@ cd /root/dev/apps/tv-proc
 chmod -R 774  /mnt/media/tv
 chown -R emby /mnt/media/tv
 
-/root/.nvm/versions/node/v16.15.1/bin/node /root/dev/apps/tv-proc/prune-dupes.js\
+/root/.nvm/versions/node/v16.15.1/bin/node /root/dev/apps/tv-proc/prune-dupes.js \
     >> /root/dev/apps/tv-proc/tv.log
 # date >> /root/dev/apps/tv-proc/tv.log
 chmod -R 774  /mnt/media/tv

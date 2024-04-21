@@ -1,0 +1,7 @@
+#! /bin/bash
+
+coffee -co movie.js movie.coffee
+
+cd /root/dev/apps/tv-proc
+/root/.nvm/versions/node/v16.15.1/bin/node /root/dev/apps/tv-proc/movie.js $1
+

@@ -12,11 +12,6 @@ else
 escQuotes = (str) ->
   '"' + str.replace(/\\/g, '\\\\')
            .replace(/"/g,  '\\"') + '"'
-          #  .replace(/'|`/g,  "\\'")
-          #  .replace(/\(/g, "\\(")
-          #  .replace(/\)/g, "\\)")
-          #  .replace(/\&/g, "\\&")
-          #  .replace(/\s/g, '\\ ')  
 
 findUsb = "ssh #{usbHost} find files -type f -printf " +
     "'%CY-%Cm-%Cd-%P\\\\\\n' | " +
@@ -41,8 +36,7 @@ while true
     console.log "no files found"
     process.exit()
 
-videoPath    = "files/#{usbFilePath}"
-usbLongPath  = "#{usbHost}:#{videoPath}"
+usbLongPath = "#{usbHost}:files/#{usbFilePath}"
 
 console.log()
 

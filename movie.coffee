@@ -33,7 +33,7 @@ while true
         not fname.includes 'sample'
       break
   else
-    console.log "no files found"
+    console.log "no mkv or mp4 file found"
     process.exit()
 
 usbLongPath = "#{usbHost}:files/#{usbFilePath}"

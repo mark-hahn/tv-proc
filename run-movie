@@ -3,12 +3,14 @@
 
 s="$(pgrep -f tv-proc/main.js)"
 if [ ${#s} -gt 1 ] ; then
-  echo "already running"
+  echo "--  tv-proc not started, main.js already running  --"
+  echo >> /root/dev/apps/tv-proc/tv.log
   exit
 fi
 s="$(pgrep -f tv-proc/movie.js)"
 if [ ${#s} -gt 1 ] ; then
-  echo "already running"
+  echo "--  tv-proc not started, movie.js already running  --"
+  echo >> /root/dev/apps/tv-proc/tv.log
   exit
 fi
 

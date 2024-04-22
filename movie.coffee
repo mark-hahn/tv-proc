@@ -114,12 +114,11 @@ while true
 videoPath    = "files/#{usbFilePath}"
 usbLongPath  = "#{usbHost}:#{videoPath}"
 
-console.log "usb path: #{usbFilePath}"
+console.log()
 
 try
-  console.log(exec("rsync -av #{escQuotes usbLongPath} #{escQuotes '/mnt/media/movies/'}",
-                    fileTimeout).toString().replace('\n\n', '\n'),
-                  ((Date.now() - time)/1000).toFixed(0) + ' secs')
+  exec("rsync -avP #{escQuotes usbLongPath} " +
+         "#{escQuotes '/mnt/media/movies/'}", {stdio: 'inherit'})
 catch e
   console.log "\nvvvvvvvv\nrsync download error: \n#{e.message}^^^^^^^^^"
   badFile();

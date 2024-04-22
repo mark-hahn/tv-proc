@@ -104,7 +104,8 @@ while true
     fname = parts[parts.length-1]
     parts = fname.split '.'
     fext  = parts[parts.length-1]
-    if fext.length == 6 or fext in ['mkv','mp4']
+    if (fext.length == 6 or fext in ['mkv','mp4']) and 
+        not fname.includes 'sample'
       break
   else
     console.log "no files found"

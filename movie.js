@@ -141,7 +141,7 @@
       fname = parts[parts.length - 1];
       parts = fname.split('.');
       fext = parts[parts.length - 1];
-      if (fext.length === 6 || (fext === 'mkv' || fext === 'mp4')) {
+      if ((fext.length === 6 || (fext === 'mkv' || fext === 'mp4')) && !fname.includes('sample')) {
         break;
       }
     } else {

@@ -4,6 +4,11 @@ if [ ${#s} -gt 1 ] ; then
   echo "already running"
   exit
 fi
+s="$(pgrep -f tv-proc/movie.js)"
+if [ ${#s} -gt 1 ] ; then
+  echo "already running"
+  exit
+fi
 cd /root/dev/apps/tv-proc
 echo >> /root/dev/apps/tv-proc/tv.log
 echo "====== Getting files with regex \"$1\" ======"

@@ -1,6 +1,18 @@
 #! /bin/bash
 
-coffee -co movie.js movie.coffee
+
+s="$(pgrep -f tv-proc/main.js)"
+if [ ${#s} -gt 1 ] ; then
+  echo "already running"
+  exit
+fi
+s="$(pgrep -f tv-proc/movie.js)"
+if [ ${#s} -gt 1 ] ; then
+  echo "already running"
+  exit
+fi
+
+coffee -c movie.coffee
 
 cd /root/dev/apps/tv-proc
 /root/.nvm/versions/node/v16.15.1/bin/node /root/dev/apps/tv-proc/movie.js $1

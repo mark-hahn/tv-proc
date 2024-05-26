@@ -1,0 +1,42 @@
+
+/opt/emby-server
+/var/lib/emby
+/etc/init/emby-server.conf
+/etc/emby-server.conf
+
+dpkg -i emby-server-deb_4.8.0.47_amd64.deb
+
+ /etc/init/emby-server.conf
+
+ docker run -d \
+  --name=plex \
+  --net=host \
+  -e PUID=0 \
+  -e PGID=0  \
+  -e TZ=Etc/UTC \
+  -e VERSION=docker \
+  -e PLEX_CLAIM= `#optional`       \
+  -v /mnt/media/plex-config:/mnt/media/plex-config \
+  -v /mnt/media/tv:/mnt/media/tv              \
+  -v /mnt/media/movies:/mnt/media/movies      \
+  --restart unless-stopped         \
+  lscr.io/linuxserver/plex:latest
+
+  docker run -d \
+  --name=jellyfin \
+  -e PUID=0 \
+  -e PGID=0 \
+  -e TZ=Etc/UTC \
+  -e JELLYFIN_PublishedServerUrl=192.168.1.103 `#optional` \
+  -p 8097:8096 \
+  -v /mnt/media/jelly-config:/mnt/media/jelly-config \
+  -v /mnt/media/tv:/mnt/media/tv              \
+  -v /mnt/media/movies:/mnt/media/movies      \
+  --restart unless-stopped \
+  lscr.io/linuxserver/jellyfin:latest
+
+  -p 8920:8920 `#optional` \
+
+... not needed for chromecast ...
+  -p 7359:7359/udp `#optional` \
+  -p 1900:1900/udp `#optional` \

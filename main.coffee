@@ -213,7 +213,7 @@ checkFile = =>
         writeMap 'tv-recent.json', recent
         # fs.writeFileSync 'tv-recent.json', JSON.stringify recent
         blockedCount++
-        console.log '-- BLOCKED:', fname
+        console.log '-- BLOCKED:', {blkName, fname}
         process.nextTick checkFile
         return
     # console.log('not blocked', usbLine);

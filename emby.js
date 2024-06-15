@@ -23,7 +23,7 @@ const getToken = async () => {
   };
   const showsRes = await axios(config);
   token = showsRes.data.AccessToken;
-  console.log('emby.js getToken:', token);
+  // console.log('emby.js getToken:', token);
 }
 
 
@@ -41,16 +41,13 @@ const scanLibrariesUrl = () => {
 }
 
 const scanLibrary = async () => {
-  const url = scanLibrariesUrl();
-  const scanLibraryRes = await axios.post(url);
-  console.log('scanLibrary results:', scanLibraryRes.status);
+  await axios.post(scanLibrariesUrl());
 }
 
-module.exports = scanLibrary;
+exports.scanLibrary = scanLibrary;
 
-(async () => {
+exports.init = async () => {
   await getToken();
-  // await scanLibrary();
-})()
+}
 
 

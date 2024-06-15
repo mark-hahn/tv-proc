@@ -1,5 +1,7 @@
 #! /bin/bash
 
+#  run-movie <path to movie file at usb>
+
 
 s="$(pgrep -f tv-proc/main.js)"
 if [ ${#s} -gt 1 ] ; then
@@ -18,4 +20,3 @@ coffee -c movie.coffee
 
 cd /root/dev/apps/tv-proc
 /root/.nvm/versions/node/v16.15.1/bin/node /root/dev/apps/tv-proc/movie.js $1
-

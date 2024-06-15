@@ -28,6 +28,10 @@ exec = require('child_process').execSync
 mkdirp = require 'mkdirp'
 request = require 'request'
 rimraf  = require 'rimraf'
+scanlibrary = require "./emby.js";
+scanLibraryFlag = false
+
+# await emby.init()
 
 filterRegex = null
 filterRegexTxt = ''
@@ -258,6 +262,12 @@ checkFile = =>
       console.log  'downloaded:      ', downloadCount
     console.log 'elapsed(mins):   ',
                ((Date.now()-startTime)/(60*1000)).toFixed(1)
+
+    if downloadCount > 0 then scanLibraryFlag = true
+    else if scanLibraryFlag
+      scanLibrary()
+      scanLibraryFlag = false
+
     if (deleteCount + existsCount + errCount + downloadCount + blockedCount) > 0
       console.log "***********************************************************"
 
